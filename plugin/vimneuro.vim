@@ -7,14 +7,12 @@ if exists("g:vimneuro_load") && g:vimneuro_load == 0
 	finish
 endif
 
+" TODO Check for User Setting of path to Zettelkasten
+let g:vimneuro_path_zettelkasten = "/home/".$USER."/zettelkasten"
+
 " Save user's options, for restoring at the end of the script.
 let s:save_cpo = &cpo
 set cpo&vim
-
-
-function! s:Test()
-	echom "hello from test"	
-endfunction
 
 augroup vimneuro
 	autocmd!
@@ -25,15 +23,72 @@ augroup vimneuro
 
 	if exists("g:vimneuro_did_load_mappings") == v:false
 
-		" Buffer local mapping for: open file on current line with `xdg-open`.
-		if !hasmapto('<Plug>NeuroTest')
-			autocmd Filetype markdown nmap <buffer><leader>qtq	<Plug>NeuroTest
+		" Go Zettel
+		if !hasmapto('<Plug>NeuronGoZettel')
+			autocmd Filetype markdown nmap <buffer><leader>gf	<Plug>NeuronGoZettel
 		endif
-		noremap <unique> <script> <Plug>NeuroTest		<SID>Test
-		noremap <SID>Test		:<c-u> call <SID>Test()<CR>
+		noremap <unique> <script> <Plug>NeuronGoZettel		<SID>GoZettel
+		noremap <SID>GoZettel		:<c-u>call vimneuro#GoZettel()<CR>
+		
+		" New Neuron Zettel
+		if !hasmapto('<Plug>NeuronNewZettel')
+			autocmd Filetype markdown nmap <buffer><leader>nn	<Plug>NeuronNewZettel
+		endif
+		noremap <unique> <script> <Plug>NeuronNewZettel		<SID>NewZettel
+		noremap <SID>NewZettel		:<c-u>call vimneuro#NewZettel()<CR>
+
+		" Rename Current Neuron Zettel
+		if !hasmapto('<Plug>NeuronRenameCurrentZettel')
+			autocmd Filetype markdown nmap <buffer><leader>nr	<Plug>NeuronRenameCurrentZettel
+		endif
+		noremap <unique> <script> <Plug>NeuronRenameCurrentZettel		<SID>RenameCurrentZettel
+		noremap <SID>RenameCurrentZettel		:<c-u>call vimneuro#RenameCurrentZettel()<CR>
+
+		" Insert Link to Alternate Buffer
+		if !hasmapto('<Plug>NeuronInsertLinkToAlternateBuffer')
+			autocmd Filetype markdown nmap <buffer><leader>na	<Plug>NeuronInsertLinkToAlternateBuffer
+		endif
+		noremap <unique> <script> <Plug>NeuronInsertLinkToAlternateBuffer		<SID>InsertLinkToAlternateBuffer
+		noremap <SID>InsertLinkToAlternateBuffer		:<c-u>call vimneuro#InsertLinkToAlternateBuffer()<CR>
+
+		" Linking Operator (Normal Mode)
+		if !hasmapto('<Plug>NeuronLinkingOperatorNormal')
+			autocmd Filetype markdown nmap <buffer><leader>nl	<Plug>NeuronLinkingOperatorNormal
+		endif
+		noremap <unique> <script> <Plug>NeuronLinkingOperatorNormal		<SID>LinkingOperatorNormal
+		noremap <SID>LinkingOperatorNormal		:<c-u>set operatorfunc=vimneuro#LinkingOperator<cr>g@
+		
+		" Linking Operator (Visual Mode)
+		if !hasmapto('<Plug>NeuronLinkingOperatorVisual')
+			autocmd Filetype markdown vmap <buffer><leader>nl	<Plug>NeuronLinkingOperatorVisual
+		endif
+		noremap <unique> <script> <Plug>NeuronLinkingOperatorVisual		<SID>LinkingOperatorVisual
+		noremap <SID>LinkingOperatorVisual		:<c-u>call vimneuro#LinkingOperator(visualmode())<cr>
+		
+		" Create & Copy Link of Filename of current Buffer 
+		if !hasmapto('<Plug>NeuronCopyLinkOfCurrentBuffer')
+			autocmd Filetype markdown nmap <buffer><leader>ncf	<Plug>NeuronCopyLinkOfCurrentBuffer
+		endif
+		noremap <unique> <script> <Plug>NeuronCopyLinkOfCurrentBuffer		<SID>CopyLinkOfCurrentBuffer
+		noremap <SID>CopyLinkOfCurrentBuffer		:<c-u>call vimneuro#CopyLinkOfCurrentBuffer()<cr>
+		
+		" Create & Copy Link of first Filename in current Line
+		if !hasmapto('<Plug>NeuronCopyLinkOfCurrentLine')
+			autocmd Filetype * nmap <buffer><leader>ncl	<Plug>NeuronCopyLinkOfCurrentLine
+		endif
+		noremap <unique> <script> <Plug>NeuronCopyLinkOfCurrentLine		<SID>CopyLinkOfCurrentLine
+		noremap <SID>CopyLinkOfCurrentLine		:<c-u>call vimneuro#CopyLinkOfCurrentLine(line('.'))<cr>
+		
+		" Create & Copy Link of first Filename in current Visual Selection
+		if !hasmapto('<Plug>NeuronCopyLinkOfSelection')
+			autocmd Filetype * vmap <buffer><leader>ncl	<Plug>NeuronCopyLinkOfSelection
+		endif
+		noremap <unique> <script> <Plug>NeuronCopyLinkOfSelection		<SID>CopyLinkOfSelection
+		noremap <SID>CopyLinkOfSelection		:<c-u>call vimneuro#CopyLinkOfSelection()<cr>
+		
+		" call vimneuro#Foobar()<cr>
 
 		let g:vimneuro_did_load_mappings = 1
-
 	endif
 augroup END
 
