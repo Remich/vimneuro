@@ -20,8 +20,8 @@ function! vimneuro#GoZettel()
 endfunction
 
 function! vimneuro#NewZettel()
-	let l:title = input("Enter title for new Zettel: ")
 	let l:name  = input("Enter name for new Zettel: ")
+	let l:title = input("Enter title for new Zettel: ")
 	redraw
 	call vimneuro#CreateZettel(l:name, l:title)
 endfunction
@@ -115,6 +115,7 @@ function! vimneuro#RenameCurrentZettel()
 	let l:oldname = bufname()
 	let l:newname = input("Enter new name: ")
 	redraw
+	echom ""
 
 	if l:newname == ""
 		echom "ERROR: No name supplied."
@@ -130,7 +131,7 @@ function! vimneuro#RenameCurrentZettel()
 	let l:fullname = l:newname.".md"
 	if vimneuro#RenameZettel(l:oldname, l:fullname) != v:false
 		execute "file! ".l:fullname
-		update!
+		silent write!
 		
 		" update all links
 		let l:oldlink = substitute(l:oldname, '\v\.md', '', "")
@@ -158,16 +159,34 @@ function! vimneuro#CreateLinkOfFilename(filename)
 	return "<" . substitute(a:filename, '\.md', '', "") .">"
 endfunction
 
-function! vimneuro#InsertLinkToAlternateBuffer()
+function! vimneuro#PasteLinkAsUlItem()
+	execute "normal! o\<esc>\"_d0i- \<c-r>+\<esc>"
+endfunction
+
+function! vimneuro#GetLinkToAlternateBuffer()
 	let l:filename = bufname(0)
 	
 	if l:filename ==# ""
 		echom "ERROR: No alternative buffer"
-		return
+		return v:false
 	endif
 	
-	let l:link = vimneuro#CreateLinkOfFilename(l:filename)
-	call nvim_paste(l:link, v:true, -1)
+	return vimneuro#CreateLinkOfFilename(l:filename)
+endfunction
+
+function! vimneuro#InsertLinkToAlternateBuffer()
+	let l:link = vimneuro#GetLinkToAlternateBuffer()
+	if l:link != v:false
+		call nvim_paste(l:link, v:true, -1)
+	endif
+endfunction
+
+function! vimneuro#InsertLinkToAlternateBufferAsUlItem()
+	let l:link = vimneuro#GetLinkToAlternateBuffer()
+	if l:link != v:false
+		let @+ = l:link
+		call vimneuro#PasteLinkAsUlItem()
+	endif
 endfunction
 
 " create a neuron link to the zettel matching the text

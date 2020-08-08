@@ -37,20 +37,27 @@ augroup vimneuro
 		noremap <unique> <script> <Plug>NeuronNewZettel		<SID>NewZettel
 		noremap <SID>NewZettel		:<c-u>call vimneuro#NewZettel()<CR>
 
-		" Rename Current Neuron Zettel
+		" Rename current Neuron Zettel
 		if !hasmapto('<Plug>NeuronRenameCurrentZettel')
 			autocmd Filetype markdown nmap <buffer><leader>nr	<Plug>NeuronRenameCurrentZettel
 		endif
 		noremap <unique> <script> <Plug>NeuronRenameCurrentZettel		<SID>RenameCurrentZettel
 		noremap <SID>RenameCurrentZettel		:<c-u>call vimneuro#RenameCurrentZettel()<CR>
 
-		" Insert Link to Alternate Buffer
+		" Insert link to alternate buffer
 		if !hasmapto('<Plug>NeuronInsertLinkToAlternateBuffer')
 			autocmd Filetype markdown nmap <buffer><leader>na	<Plug>NeuronInsertLinkToAlternateBuffer
 		endif
 		noremap <unique> <script> <Plug>NeuronInsertLinkToAlternateBuffer		<SID>InsertLinkToAlternateBuffer
 		noremap <SID>InsertLinkToAlternateBuffer		:<c-u>call vimneuro#InsertLinkToAlternateBuffer()<CR>
-
+		
+		" Insert link of alternate file as unordered list item below the current line
+		if !hasmapto('<Plug>NeuronInsertLinkToAlternateBufferAsUlItem')
+			autocmd Filetype markdown nmap <buffer><leader>a<c-v>	<Plug>NeuronInsertLinkToAlternateBufferAsUlItem
+		endif
+		noremap <unique> <script> <Plug>NeuronInsertLinkToAlternateBufferAsUlItem		<SID>InsertLinkToAlternateBufferAsUlItem
+		noremap <SID>InsertLinkToAlternateBufferAsUlItem		:<c-u>call vimneuro#InsertLinkToAlternateBufferAsUlItem()<cr>
+		
 		" Linking Operator (Normal Mode)
 		if !hasmapto('<Plug>NeuronLinkingOperatorNormal')
 			autocmd Filetype markdown nmap <buffer><leader>nl	<Plug>NeuronLinkingOperatorNormal
@@ -65,21 +72,28 @@ augroup vimneuro
 		noremap <unique> <script> <Plug>NeuronLinkingOperatorVisual		<SID>LinkingOperatorVisual
 		noremap <SID>LinkingOperatorVisual		:<c-u>call vimneuro#LinkingOperator(visualmode())<cr>
 		
-		" Create & Copy Link of Filename of current Buffer 
+		" Create & copy link of filename of current buffer 
 		if !hasmapto('<Plug>NeuronCopyLinkOfCurrentBuffer')
-			autocmd Filetype markdown nmap <buffer><leader>ncf	<Plug>NeuronCopyLinkOfCurrentBuffer
+			autocmd Filetype markdown nmap <buffer><c-c>	<Plug>NeuronCopyLinkOfCurrentBuffer
 		endif
 		noremap <unique> <script> <Plug>NeuronCopyLinkOfCurrentBuffer		<SID>CopyLinkOfCurrentBuffer
 		noremap <SID>CopyLinkOfCurrentBuffer		:<c-u>call vimneuro#CopyLinkOfCurrentBuffer()<cr>
 		
-		" Create & Copy Link of first Filename in current Line
+		" Paste link as unordered list item below the current line
+		if !hasmapto('<Plug>NeuronPasteLinkAsUlItem')
+			autocmd Filetype markdown nmap <buffer><leader><c-v>	<Plug>NeuronPasteLinkAsUlItem
+		endif
+		noremap <unique> <script> <Plug>NeuronPasteLinkAsUlItem		<SID>PastLinkAsUlItem
+		noremap <SID>PastLinkAsUlItem		:<c-u>call vimneuro#PasteLinkAsUlItem()<cr>
+		
+		" Create & copy link of first filename in current line
 		if !hasmapto('<Plug>NeuronCopyLinkOfCurrentLine')
 			autocmd Filetype * nmap <buffer><leader>ncl	<Plug>NeuronCopyLinkOfCurrentLine
 		endif
 		noremap <unique> <script> <Plug>NeuronCopyLinkOfCurrentLine		<SID>CopyLinkOfCurrentLine
 		noremap <SID>CopyLinkOfCurrentLine		:<c-u>call vimneuro#CopyLinkOfCurrentLine(line('.'))<cr>
 		
-		" Create & Copy Link of first Filename in current Visual Selection
+		" Create & copy link of first filename in current visual selection
 		if !hasmapto('<Plug>NeuronCopyLinkOfSelection')
 			autocmd Filetype * vmap <buffer><leader>ncl	<Plug>NeuronCopyLinkOfSelection
 		endif
