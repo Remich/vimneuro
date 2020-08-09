@@ -1,21 +1,21 @@
 function! vimneuro#GoZettel()
 	let l:word = expand("<cWORD>")
-	
+
 	" check if this is a valid Neuron link
 	if match(l:word, '\v\<[A-Za-z0-9-_]+(\?cf)?\>') == -1
 		echom "nomatch"
 		return
 	endif
-	
+
 	let l:filename = substitute(l:word, '\v\<([A-Za-z0-9-_]+)(\?cf)?\>', '\1', "") . ".md"
-	
+
 	" check for existing Zettel with supplied name
 	let l:fullname = g:vimneuro_path_zettelkasten."/".l:filename
 	if filereadable(l:fullname) == v:false
 		echom "ERROR: Zettel with name '".l:fullname."' does not exist!"
 		return
 	endif
-	
+
 	execute "edit! ".l:filename
 endfunction
 
@@ -132,24 +132,24 @@ function! vimneuro#RenameCurrentZettel()
 	if vimneuro#RenameZettel(l:oldname, l:fullname) != v:false
 		execute "file! ".l:fullname
 		silent write!
-		
+
 		" update all links
 		let l:oldlink = substitute(l:oldname, '\v\.md', '', "")
 		call vimneuro#RelinkZettel(l:oldlink, l:newname)
 	endif
-	
+
 endfunction
 
 " replaces links to Zettel 'oldname' with 'newname' in every Zettel
 function! vimneuro#RelinkZettel(oldname, newname)
 	let l:curbuf    = bufnr()
 	let linkpattern = '<'.a:oldname.'(\?cf)?>'
-	
+
 	silent execute "grep! '".linkpattern."'" 
 	" copen
 	execute 'cfdo %substitute/\v\<'.a:oldname.'(\?cf)?\>/\<'.a:newname.'\1\>/g'
 	cfdo update
-	
+
 	" switch back to original buffer
 	execute "buffer ".l:curbuf	
 	return v:true
@@ -165,12 +165,12 @@ endfunction
 
 function! vimneuro#GetLinkToAlternateBuffer()
 	let l:filename = bufname(0)
-	
+
 	if l:filename ==# ""
 		echom "ERROR: No alternative buffer"
 		return v:false
 	endif
-	
+
 	return vimneuro#CreateLinkOfFilename(l:filename)
 endfunction
 
@@ -223,7 +223,7 @@ function! vimneuro#LinkingOperator(type)
 		let @k = vimneuro#CreateLinkOfFilename(bufname(d.bufnr))
 		normal! `[v`]"kp
 	endif
-	
+
 	let &selection = sel_save
 	let @@ = reg_save_1
 	let @k = reg_save_2
@@ -247,11 +247,11 @@ function! vimneuro#GetLinkOfCurrentLine(linenum)
 	let l:line     = getline(a:linenum)
 	let l:filename = []
 	call substitute(l:line, '\v(^|\s)\zs[a-z0-9]+\ze\.md', '\=add(l:filename, submatch(0))', 'g')
-	
+
 	if len(l:filename) == 0
 		return
 	endif
-	
+
 	let l:links = map(l:filename, '"<".v:val.">"')
 	return l:links[0]
 endfunction
@@ -270,4 +270,22 @@ function! vimneuro#CopyLinkOfSelection()
 	endfor
 	let @+ = str
 	echom "Copied links to + register"
+endfunction
+
+function! vimneuro#PreviewFile()
+	
+	if exists("g:vimneuro_cmd_browser") == v:false
+		echom "ERROR: 'g:vimneuro_cmd_browser' not set! Abort."
+		return
+	endif
+
+	let l:filename = substitute(expand('%'), '\v\.md', '\.html', "")
+	let l:url      = g:vimneuro_url_zettelkasten."/".l:filename
+	let l:cmd      = shellescape(g:vimneuro_cmd_browser)." ".shellescape(l:url)
+	
+	if exists("g:vimneuro_cmd_browser_options") == v:true
+		let l:cmd = l:cmd." ".shellescape(g:vimneuro_cmd_browser_options)
+	endif
+	
+	silent call jobstart(l:cmd)
 endfunction
