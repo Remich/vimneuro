@@ -43,7 +43,7 @@ endfunction
 function! vimneuro#NewZettel()
 
 	let l:title = trim(input("Enter title for new Zettel: "))
-	
+
 	" no title supplied, use default
 	if l:title ==# ''
 		let l:today = system('date "+%Y-%m-%d"')
@@ -220,6 +220,20 @@ function! vimneuro#InsertLinkToAlternateBufferAsUlItem()
 	endif
 endfunction
 
+function! vimneuro#GetIncrementalFilename(name)
+	let l:i        = 1
+	let l:name     = a:name."-".l:i.".md"
+	let l:fullname = g:vimneuro_path_zettelkasten."/".a:name
+	
+	while filereadable(l:fullname) == v:true
+		let l:i        = l:i + 1
+		let l:name     = a:name."-".l:i.".md"
+		let l:fullname = g:vimneuro_path_zettelkasten."/".a:name
+	endwhile
+	
+	return a:name."-".l:i
+endfunction
+
 " create a neuron link to the zettel matching the text
 function! vimneuro#LinkingOperator(type)
 	let sel_save = &selection
@@ -242,7 +256,11 @@ function! vimneuro#LinkingOperator(type)
 	if len(l:results) == 0
 		let l:i = input("ERROR: No Zettel with title ".shellescape(l:title)." found. Create new Zettel? (y/n) ")
 		if l:i ==# "y"
-			let l:name = input("Enter name for new Zettel: ")
+			let l:name     = vimneuro#TransformTitleToName(l:title)
+			let l:fullname = g:vimneuro_path_zettelkasten."/".l:name.".md"
+			if filereadable(l:fullname) == v:true
+				let l:name = vimneuro#GetIncrementalFilename(l:name)
+			endif
 			call vimneuro#CreateZettel(l:name, l:title)
 		else
 			echom ""
@@ -251,7 +269,8 @@ function! vimneuro#LinkingOperator(type)
 		echoe "ERROR: Multiple Zettels with title (".shellescape(l:title).") found."
 	else
 		let d = l:results[0]
-		let @k = vimneuro#CreateLinkOfFilename(bufname(d.bufnr))
+		let l:basename = trim(system('basename '.shellescape(bufname(d.bufnr))))
+		let @k = vimneuro#CreateLinkOfFilename(l:basename)
 		normal! `[v`]"kp
 	endif
 
