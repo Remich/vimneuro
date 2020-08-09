@@ -110,6 +110,13 @@ augroup vimneuro
 			noremap <unique> <script> <Plug>NeuronPreviewFile		<SID>PreviewFile
 			noremap <SID>PreviewFile		:<c-u>call vimneuro#PreviewFile()<cr>
 		endif
+		
+		" Add tag
+		if !hasmapto('<Plug>NeuronAddTag')
+			autocmd Filetype markdown nmap <buffer><leader>nt	<Plug>NeuronAddTag
+			noremap <unique> <script> <Plug>NeuronAddTag		<SID>AddTag
+			noremap <SID>AddTag		:<c-u>call vimneuro#AddTag()<cr>
+		endif
 
 		" call vimneuro#Foobar()<cr>
 

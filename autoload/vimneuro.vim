@@ -341,3 +341,63 @@ function! vimneuro#PreviewFile()
 
 	silent call jobstart(l:cmd)
 endfunction
+
+function! vimneuro#HasZettelMetaDataTag()
+	let l:curlinenum = 2
+	let l:found      = v:false
+	let l:curline    = getline(l:curlinenum)
+	while match(l:curline, '\v---') == -1 && l:found == v:false
+		let l:curlinenum = l:curlinenum + 1
+		let l:curline    = getline(l:curlinenum)
+		if match(l:curline, '\v^tags:') != -1
+			let l:found = v:true
+		endif
+	endwhile
+
+	if l:found == v:false
+		return v:false
+	else
+		return l:curlinenum
+	endif
+endfunction
+
+function! vimneuro#GetZettelMetaDataTagEnd(taglinenum)
+	let l:curlinenum = a:taglinenum		
+	let l:curline = getline(l:curlinenum)
+	while match(l:curline, '\v- ') != -1
+		let l:curlinenum = l:curlinenum + 1
+		let l:curline = getline(l:curlinenum)
+	endwhile
+	return l:curlinenum	- 1
+endfunction
+
+function! vimneuro#AddTag()
+	let l:input = trim(input("Enter tag(s): "))
+	if l:input ==# ""
+		echom "ERROR: No tag(s) supplied."
+		return
+	endif
+
+	let l:tags = split(l:input, '\v;')
+	call map(l:tags, 'trim(v:val)')
+
+	let l:regsave = @z
+	
+	let @z = ""
+	for i in l:tags
+		let @z = @z."- ".i."\n"
+	endfor
+	
+	" check if the Zettel already has some tags
+	let l:taglinenum = vimneuro#HasZettelMetaDataTag()
+	if l:taglinenum == v:false
+		" get meta end
+	else
+		let l:insertafterlinenum = vimneuro#GetZettelMetaDataTagEnd(l:taglinenum + 1)
+	endif
+
+	mark `
+	execute "normal! ".l:insertafterlinenum."gg\<esc>\"zp``"	
+
+	let @z = l:regsave
+endfunction
