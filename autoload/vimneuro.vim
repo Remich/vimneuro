@@ -19,9 +19,40 @@ function! vimneuro#GoZettel()
 	execute "edit! ".l:filename
 endfunction
 
+function! vimneuro#TransformTitleToName(title)
+	" replace spaces with '-'
+	let l:name = a:title
+	let l:name = substitute(l:name, '\v\s', '-', "g")
+	" replace 'Umlaute'
+	let l:name = substitute(l:name, '\vä', 'ae', "g")
+	let l:name = substitute(l:name, '\vö', 'oe', "g")
+	let l:name = substitute(l:name, '\vü', 'ue', "g")
+	" replace 'ß'
+	let l:name = substitute(l:name, '\vß', 'ss', "g")
+	" remove all unallowed characters
+	let l:name = substitute(l:name, '\v[^A-Za-z0-9_-]', '', "g")
+	" replace multiple '-' with exactly one '-'
+	let l:name = substitute(l:name, '\v-{2,}', '-', "g")
+	" remove leading '-'
+	let l:name = substitute(l:name, '\v^\zs-\ze.*', '', "g")
+	" remove trailing '-'
+	let l:name = substitute(l:name, '\v^.*\zs-\ze$', '', "g")
+	return l:name
+endfunction
+
 function! vimneuro#NewZettel()
-	let l:name  = input("Enter name for new Zettel: ")
-	let l:title = input("Enter title for new Zettel: ")
+
+	let l:title = trim(input("Enter title for new Zettel: "))
+	
+	" no title supplied, use default
+	if l:title ==# ''
+		let l:today = system('date "+%Y-%m-%d"')
+		let l:title = 'Zettel created on '.l:today
+		let l:name  = ''
+	else
+		let l:name = vimneuro#TransformTitleToName(l:title)
+	endif
+
 	redraw
 	call vimneuro#CreateZettel(l:name, l:title)
 endfunction
@@ -273,7 +304,7 @@ function! vimneuro#CopyLinkOfSelection()
 endfunction
 
 function! vimneuro#PreviewFile()
-	
+
 	if exists("g:vimneuro_cmd_browser") == v:false
 		echom "ERROR: 'g:vimneuro_cmd_browser' not set! Abort."
 		return
@@ -282,10 +313,10 @@ function! vimneuro#PreviewFile()
 	let l:filename = substitute(expand('%'), '\v\.md', '\.html', "")
 	let l:url      = g:vimneuro_url_zettelkasten."/".l:filename
 	let l:cmd      = shellescape(g:vimneuro_cmd_browser)." ".shellescape(l:url)
-	
+
 	if exists("g:vimneuro_cmd_browser_options") == v:true
 		let l:cmd = l:cmd." ".shellescape(g:vimneuro_cmd_browser_options)
 	endif
-	
+
 	silent call jobstart(l:cmd)
 endfunction
