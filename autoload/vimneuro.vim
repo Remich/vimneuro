@@ -334,7 +334,7 @@ function! vimneuro#PreviewFile()
 	let l:cmd      = shellescape(g:vimneuro_cmd_browser)." ".shellescape(l:url)
 
 	if exists("g:vimneuro_cmd_browser_options") == v:true
-		let l:opts = map(g:vimneuro_cmd_browser_options, 'shellescape(v:val)')
+		let l:opts = map(deepcopy(g:vimneuro_cmd_browser_options), 'shellescape(v:val)')
 		let l:opts = join(l:opts, ' ')
 		let l:cmd  = l:cmd." ".l:opts
 	endif
