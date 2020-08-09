@@ -37,6 +37,8 @@ function! vimneuro#TransformTitleToName(title)
 	let l:name = substitute(l:name, '\v^\zs-\ze.*', '', "g")
 	" remove trailing '-'
 	let l:name = substitute(l:name, '\v^.*\zs-\ze$', '', "g")
+	" only lowercase letters
+	let l:name = tolower(l:name)
 	return l:name
 endfunction
 
@@ -116,6 +118,23 @@ function! vimneuro#CreateZettel(name, title)
 				\ }
 
 	let job1 = jobstart(['bash', '-c', l:cmd], extend({'shell': 'shell 1'}, s:callbacks))
+endfunction
+
+function! vimneuro#DeleteZettel()
+	let l:filename = expand('%:p')	
+	let l:confirm = confirm('Do you really want to delete Zettel '.shellescape(l:filename).'?', "&Yes\n&No")
+
+	if l:confirm == 1
+		let l:curbufname = bufname("%")
+		if delete(l:filename) == -1
+			echom "ERROR: Deletion failed."
+		else
+			enew!
+			execute "bdelete! ".l:curbufname
+		endif
+	elseif l:confirm == 2
+		return
+	endif
 endfunction
 
 function! vimneuro#RenameZettel(oldname, newname)
@@ -399,5 +418,6 @@ function! vimneuro#AddTag()
 	mark `
 	execute "normal! ".l:insertafterlinenum."gg\<esc>\"zp``"	
 
+	echom ""
 	let @z = l:regsave
 endfunction

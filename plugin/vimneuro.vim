@@ -42,6 +42,13 @@ augroup vimneuro
 			noremap <SID>NewZettel		:<c-u>call vimneuro#NewZettel()<CR>
 		endif
 
+		" Delete Zettel
+		if !hasmapto('<Plug>NeuronDeleteZettel')
+			autocmd Filetype markdown nmap <buffer><leader>nd	<Plug>NeuronDeleteZettel
+			noremap <unique> <script> <Plug>NeuronDeleteZettel		<SID>DeleteZettel
+			noremap <SID>DeleteZettel		:<c-u>call vimneuro#DeleteZettel()<CR>
+		endif
+
 		" Rename current Neuron Zettel
 		if !hasmapto('<Plug>NeuronRenameCurrentZettel')
 			autocmd Filetype markdown nmap <buffer><leader>nr	<Plug>NeuronRenameCurrentZettel
