@@ -111,7 +111,7 @@ augroup vimneuro
 			noremap <SID>PreviewFile		:<c-u>call vimneuro#PreviewFile()<cr>
 		endif
 
-		call vimneuro#Foobar()<cr>
+		" call vimneuro#Foobar()<cr>
 
 		let g:vimneuro_did_load_mappings = 1
 	endif
