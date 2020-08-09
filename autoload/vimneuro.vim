@@ -121,16 +121,20 @@ function! vimneuro#CreateZettel(name, title)
 endfunction
 
 function! vimneuro#DeleteZettel()
-	let l:filename = expand('%:p')	
-	let l:confirm = confirm('Do you really want to delete Zettel '.shellescape(l:filename).'?', "&Yes\n&No")
+	let l:filename = expand('%:p')
+	let l:confirm  = confirm('Do you really want to delete Zettel '.shellescape(l:filename).'?', "&Yes\n&No")
 
 	if l:confirm == 1
 		let l:curbufname = bufname("%")
 		if delete(l:filename) == -1
 			echom "ERROR: Deletion failed."
 		else
+			let l:alternative = bufname("#")
 			enew!
-			execute "bdelete! ".l:curbufname
+			execute "bwipeout! ".l:curbufname
+			if l:alternative !=# ""
+				execute "buffer ".l:alternative
+			endif
 		endif
 	elseif l:confirm == 2
 		return
@@ -273,8 +277,9 @@ function! vimneuro#LinkingOperator(type)
 	let l:results = getqflist()
 
 	if len(l:results) == 0
-		let l:i = input("ERROR: No Zettel with title ".shellescape(l:title)." found. Create new Zettel? (y/n) ")
-		if l:i ==# "y"
+		
+		let l:confirm = confirm("ERROR: No Zettel with title ".shellescape(l:title)." found. Create new Zettel?", "&Yes\n&No")
+		if l:confirm == 1
 			let l:name     = vimneuro#TransformTitleToName(l:title)
 			let l:fullname = g:vimneuro_path_zettelkasten."/".l:name.".md"
 			if filereadable(l:fullname) == v:true
@@ -284,6 +289,7 @@ function! vimneuro#LinkingOperator(type)
 		else
 			echom ""
 		endif
+		
 	elseif len(l:results) > 1
 		echoe "ERROR: Multiple Zettels with title (".shellescape(l:title).") found."
 	else
