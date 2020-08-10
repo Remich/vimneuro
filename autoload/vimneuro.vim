@@ -3,11 +3,13 @@ function! vimneuro#GoZettel()
 
 	" check if this is a valid Neuron link
 	if match(l:word, '\v\<[A-Za-z0-9-_]+(\?cf)?\>') == -1
-		echom "nomatch"
 		return
 	endif
 
-	let l:filename = substitute(l:word, '\v\<([A-Za-z0-9-_]+)(\?cf)?\>', '\1', "") . ".md"
+	" extract filename
+	let l:filename = []
+	call substitute(l:word, '\v\<\zs.*\ze(\?cf)?\>', '\=add(l:filename, submatch(0))', 'g')
+	let l:filename = l:filename[0].".md"
 
 	" check for existing Zettel with supplied name
 	let l:fullname = g:vimneuro_path_zettelkasten."/".l:filename
