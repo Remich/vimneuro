@@ -413,11 +413,11 @@ endfunction
 function! vimneuro#GetZettelMetaDataEnd()
 	let l:curlinenum = 2
 	let l:curline = getline(l:curlinenum)
-	while match(l:curline, '\v---') != -1
+	while match(l:curline, '\v---') == -1
 		let l:curlinenum = l:curlinenum + 1
 		let l:curline = getline(l:curlinenum)
 	endwhile
-	return l:curlinenum
+	return l:curlinenum - 1
 endfunction
 
 function! vimneuro#AddTag()
@@ -449,7 +449,7 @@ function! vimneuro#AddTag()
 		let @y = l:regsave_1
 		let l:insertafterlinenum += 1
 	else
-		let l:insertafterlinenum = vimneuro#GetZettelMetaDataTagEnd(l:taglinenum + 1)
+		let l:insertafterlinenum = vimneuro#GetZettelMetaDataTagEnd(l:taglinenum)
 	endif
 
 	execute "normal! ".l:insertafterlinenum."gg\<esc>\"zp``"	
