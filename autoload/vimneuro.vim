@@ -228,7 +228,23 @@ function! vimneuro#GetZettelTitle()
 	return v:false
 endfunction
 
-function! vimneuro#RenameCurrentZettelToTitle()
+function! vimneuro#RenameCurrentZettelToTitle(...)
+
+	" per default, always confirm
+	let l:dont_confirm = v:false
+
+	if a:0 > 1
+		echom "ERROR: Too many arguments supplied. Only zero or one argument are allowed."
+	endif
+
+	" check for optional argument, 
+	" if we should prompt for confirmation before renaming
+	if a:0 == 1		" is there a function argument?
+		if a:1			" does the argument evaluate to true?
+			let l:dont_confirm = v:true
+		endif
+	endif
+	
 	let l:title   = vimneuro#GetZettelTitle()
 	if l:title == v:false
 		echom "ERROR: No title found!"
@@ -250,7 +266,11 @@ function! vimneuro#RenameCurrentZettelToTitle()
 		return
 	endi
 
-	let l:confirm = confirm('Rename Zettel to '.shellescape(l:newname).'?', "&Yes\n&No")
+	if l:dont_confirm == v:false
+		let l:confirm = confirm('Rename Zettel to '.shellescape(l:newname).'?', "&Yes\n&No")
+	else
+		let l:confirm = 1
+	endif
 
 	if l:confirm == 1
 		

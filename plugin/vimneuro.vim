@@ -61,7 +61,7 @@ augroup vimneuro
 			autocmd Filetype markdown nmap <buffer><leader>nR	<Plug>NeuronRenameCurrentZettelToTitle
 			noremap <unique> <script> <Plug>NeuronRenameCurrentZettelToTitle		<SID>RenameCurrentZettelToTitle
 			noremap <SID>RenameCurrentZettelToTitle		:<c-u>call vimneuro#RenameCurrentZettelToTitle()<CR>
-			command! -nargs=0 VNRenameToTitle	:call vimneuro#RenameCurrentZettelToTitle()
+			command! -nargs=? VNRenameToTitle	:call vimneuro#RenameCurrentZettelToTitle(<args>)
 		endif
 
 		if !hasmapto('<Plug>NeuronInsertLinkToAlternateBuffer')
