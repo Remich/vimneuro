@@ -407,7 +407,7 @@ function! vimneuro#GetZettelMetaDataTagEnd(taglinenum)
 		let l:curlinenum = l:curlinenum + 1
 		let l:curline = getline(l:curlinenum)
 	endwhile
-	return l:curlinenum	- 1
+	return l:curlinenum
 endfunction
 
 function! vimneuro#GetZettelMetaDataEnd()
