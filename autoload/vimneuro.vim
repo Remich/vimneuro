@@ -295,10 +295,13 @@ function! vimneuro#RelinkZettel(oldname, newname)
 	let l:curbuf    = bufnr()
 	let linkpattern = '<'.a:oldname.'(\?cf)?>'
 
-	silent execute "grep! '".linkpattern."'" 
+	silent execute "grep! '".linkpattern."' *.md" 
 	" copen
 	execute 'cfdo %substitute/\v\<'.a:oldname.'(\?cf)?\>/\<'.a:newname.'\1\>/g'
 	cfdo update
+	
+	" restore old quickfix list
+	silent colder
 
 	" switch back to original buffer
 	execute "buffer ".l:curbuf	
