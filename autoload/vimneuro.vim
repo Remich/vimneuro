@@ -18,7 +18,16 @@ function! vimneuro#GoZettel()
 		return
 	endif
 
+	" open Zettel in current window
 	execute "edit! ".l:filename
+endfunction
+
+function! vimneuro#InsertMetaDataCreated()
+	let l:reg_save = @z
+	let l:date = trim(system('date "+%Y-%m-%dT%H:%M"'))
+	let @z = "created: ".l:date."\n"
+	execute "normal! 1j\"zpG"
+	let @z = l:reg_save
 endfunction
 
 function! vimneuro#TransformTitleToName(title)
@@ -108,6 +117,9 @@ function! vimneuro#CreateZettel(name, title)
 			else
 				execute "edit! ".trim(s:stdout[0])
 			endif
+			
+			" insert meta-data 'created'
+			call vimneuro#InsertMetaDataCreated()
 		endif
 
 		echom str
