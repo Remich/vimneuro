@@ -56,6 +56,14 @@ augroup vimneuro
 			noremap <SID>RenameCurrentZettel		:<c-u>call vimneuro#RenameCurrentZettel()<CR>
 		endif
 
+		" Rename current Neuron Zettel to title of Zettel
+		if !hasmapto('<Plug>NeuronRenameCurrentZettelToTitle')
+			autocmd Filetype markdown nmap <buffer><leader>nR	<Plug>NeuronRenameCurrentZettelToTitle
+			noremap <unique> <script> <Plug>NeuronRenameCurrentZettelToTitle		<SID>RenameCurrentZettelToTitle
+			noremap <SID>RenameCurrentZettelToTitle		:<c-u>call vimneuro#RenameCurrentZettelToTitle()<CR>
+			command! -nargs=0 VNRenameToTitle	:call vimneuro#RenameCurrentZettelToTitle()
+		endif
+
 		if !hasmapto('<Plug>NeuronInsertLinkToAlternateBuffer')
 			autocmd Filetype markdown nmap <buffer><leader>na	<Plug>NeuronInsertLinkToAlternateBuffer
 			noremap <unique> <script> <Plug>NeuronInsertLinkToAlternateBuffer		<SID>InsertLinkToAlternateBuffer

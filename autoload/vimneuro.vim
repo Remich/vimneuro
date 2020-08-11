@@ -117,7 +117,7 @@ function! vimneuro#CreateZettel(name, title)
 			else
 				execute "edit! ".trim(s:stdout[0])
 			endif
-			
+
 			" insert meta-data 'created'
 			call vimneuro#InsertMetaDataCreated()
 		endif
@@ -208,6 +208,68 @@ function! vimneuro#RenameCurrentZettel()
 
 endfunction
 
+function! vimneuro#GetZettelTitle()
+	let l:title      = []
+	let l:found      = v:false
+	let l:pattern    = '\v^# \zs.*\ze$'
+	let l:curlinenum = 1
+	let l:lastline   = line('$')
+
+	while l:found == v:false && l:curlinenum != l:lastline + 1
+		let l:curline = getline(l:curlinenum)
+		if match(l:curline, l:pattern) != -1
+			let l:found = v:true
+			call substitute(l:curline, l:pattern, '\=add(l:title, submatch(0))', 'g')
+			return l:title[0]
+		endif
+		let l:curlinenum += 1
+	endwhile
+
+	return v:false
+endfunction
+
+function! vimneuro#RenameCurrentZettelToTitle()
+	let l:title   = vimneuro#GetZettelTitle()
+	if l:title == v:false
+		echom "ERROR: No title found!"
+		return
+	endif
+
+	let l:newname = vimneuro#TransformTitleToName(l:title)
+
+	if l:newname ==# ""
+		echom "ERROR: Title is empty!"
+		return
+	endif
+
+	" abort, if name of Zettel is already the same as the title
+	let l:filename = expand('%')	
+	let l:basename = substitute(l:filename, '\v\.md', '', "")
+	if l:newname ==# l:basename
+		echom "Nothing to do."
+		return
+	endi
+
+	let l:confirm = confirm('Rename Zettel to '.shellescape(l:newname).'?', "&Yes\n&No")
+
+	if l:confirm == 1
+		
+		let l:fullname = l:newname.".md"
+		let l:oldname  = l:filename
+		
+		if vimneuro#RenameZettel(l:oldname, l:fullname) != v:false
+			execute "file! ".l:fullname
+			silent write!
+
+			" update all links
+			call vimneuro#RelinkZettel(l:basename, l:newname)
+		endif
+
+	else
+		return
+	endif
+endfunction
+
 " replaces links to Zettel 'oldname' with 'newname' in every Zettel
 function! vimneuro#RelinkZettel(oldname, newname)
 	let l:curbuf    = bufnr()
@@ -261,13 +323,13 @@ function! vimneuro#GetIncrementalFilename(name)
 	let l:i        = 1
 	let l:name     = a:name."-".l:i.".md"
 	let l:fullname = g:vimneuro_path_zettelkasten."/".a:name
-	
+
 	while filereadable(l:fullname) == v:true
 		let l:i        = l:i + 1
 		let l:name     = a:name."-".l:i.".md"
 		let l:fullname = g:vimneuro_path_zettelkasten."/".a:name
 	endwhile
-	
+
 	return a:name."-".l:i
 endfunction
 
@@ -291,7 +353,7 @@ function! vimneuro#LinkingOperator(type)
 	let l:results = getqflist()
 
 	if len(l:results) == 0
-		
+
 		let l:confirm = confirm("ERROR: No Zettel with title ".shellescape(l:title)." found. Create new Zettel?", "&Yes\n&No")
 		if l:confirm == 1
 			let l:name     = vimneuro#TransformTitleToName(l:title)
@@ -303,7 +365,7 @@ function! vimneuro#LinkingOperator(type)
 		else
 			echom ""
 		endif
-		
+
 	elseif len(l:results) > 1
 		echoe "ERROR: Multiple Zettels with title (".shellescape(l:title).") found."
 	else
@@ -431,14 +493,14 @@ function! vimneuro#AddTag()
 	call map(l:tags, 'trim(v:val)')
 
 	let l:regsave = @z
-	
+
 	let @z = ""
 	for i in l:tags
 		let @z = @z."- ".i."\n"
 	endfor
-	
+
 	mark `
-	
+
 	" check if the Zettel already has some tags
 	let l:taglinenum = vimneuro#HasZettelMetaDataTag()
 	if l:taglinenum == v:false
