@@ -73,13 +73,11 @@ endfunction
 function! vimneuro#CreateZettel(name, title)
 
 	if a:name != ""
-
 		" check for valid name
 		if match(a:name, '[^A-Za-z0-9-_]') != -1
 			echom "ERROR: '".a:name."' is not a valid Zettel name. Allowed Characters: [A-Za-z0-9-_]"
 			return
 		endif
-
 		" check for existing Zettel with supplied name
 		let l:fullname = g:vimneuro_path_zettelkasten."/".a:name.".md"
 		if filereadable(l:fullname) == v:true
@@ -89,49 +87,17 @@ function! vimneuro#CreateZettel(name, title)
 	endif
 
 	" create Zettel
-	if a:title == ""
-		" let l:res = trim(system("neuron new"))
-		let l:cmd = "neuron new"
-	else
-		" let l:res = trim(system("neuron new ".shellescape(a:title)))
-		let l:cmd = "neuron new ".shellescape(a:title)
+	let l:zettelname = zettels#Create(a:title)
+	
+	" edit Zettel
+	if a:name != ""
+		let l:fullname = g:vimneuro_path_zettelkasten."/".a:name.".md"
+		call vimneuro#RenameZettel(l:zettelname, l:fullname)
+		execute "edit! ".l:fullname
+		execute "normal G"
+		execute "bwipeout! ".l:zettelname
 	endif
-
-	let s:name = a:name
-	let s:stdout = []
-
-	function! s:OnEvent(job_id, data, event) dict
-
-		if a:event == 'stdout'
-			call add(s:stdout, join(a:data))
-			let str = self.shell.' stdout: '.join(a:data)
-		elseif a:event == 'stderr'
-			let str = self.shell.' stderr: '.join(a:data)
-		else
-			let str = self.shell.' exited'
-
-			if s:name != ""
-				let l:fullname = g:vimneuro_path_zettelkasten."/".s:name.".md"
-				call vimneuro#RenameZettel(trim(s:stdout[0]), l:fullname)
-				execute "edit! ".l:fullname
-			else
-				execute "edit! ".trim(s:stdout[0])
-			endif
-
-			" insert meta-data 'created'
-			call vimneuro#InsertMetaDataCreated()
-		endif
-
-		echom str
-	endfunction
-
-	let s:callbacks = {
-				\ 'on_stdout': function('s:OnEvent'),
-				\ 'on_stderr': function('s:OnEvent'),
-				\ 'on_exit': function('s:OnEvent')
-				\ }
-
-	let job1 = jobstart(['bash', '-c', l:cmd], extend({'shell': 'shell 1'}, s:callbacks))
+	
 endfunction
 
 function! vimneuro#DeleteZettel()
