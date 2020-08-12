@@ -1,4 +1,4 @@
-let g:searchterm = ""
+let g:searchquery = ""
 
 function! search#SearchByTags()
 	let l:input = trim(input("Search: "))
@@ -66,22 +66,40 @@ function! search#SearchByTags()
 	endif
 
 	if l:only_invert == v:true
-		let g:searchterm = "!".g:searchterm
+		if l:exact !=# ''
+			let g:searchquery = "!".g:searchquery
+		else
+			let g:searchquery = '!"'.g:searchquery.'"'
+		endif
 	elseif len(l:op) == 0
-		let g:searchterm = l:neg_str.l:tag
+		if l:exact !=# ''
+			let g:searchquery = l:neg_str.l:tag
+		else
+			let g:searchquery = l:neg_str.'"'.l:tag.'"'
+		endif
 	elseif l:op[0] ==# '&'
 		" compute intersection of previous qflist with current
 		call search#IntersectCurrentAndPreviousQfLists(l:qf_cur)
-		let g:searchterm .= " & ".l:neg_str.l:tag
+
+		if l:exact !=# ''
+			let g:searchquery .= " & ".l:neg_str.l:tag
+		else
+			let g:searchquery .= " & ".l:neg_str.'"'.l:tag.'"'
+		endif
 	elseif l:op[0] ==# '|'
 		" compute union of previous qflist with current
 		call search#UnionOfCurrentAndPreviousQfLists(l:qf_cur)
-		let g:searchterm .= " | ".l:neg_str.l:tag
+
+		if l:exact !=# ''
+			let g:searchquery .= " | ".l:neg_str.l:tag
+		else
+			let g:searchquery .= " | ".l:neg_str.'"'.l:tag.'"'
+		endif
 	endif
 
 	call search#QfSanitize()
 	
-	echom "Showing results for '".g:searchterm."'"
+	echom "Current Search Query: ".g:searchquery
 endfunction
 
 function! search#HasSameFilename(e1, e2)
