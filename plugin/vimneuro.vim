@@ -133,6 +133,13 @@ augroup vimneuro
 			noremap <SID>AddTag		:<c-u>call vimneuro#AddTag()<cr>
 		endif
 
+		" Search by Tags
+		if !hasmapto('<Plug>NeuronSearchByTags')
+			autocmd Filetype markdown,qf nmap <buffer><leader>S	<Plug>NeuronSearchByTags
+			noremap <unique> <script> <Plug>NeuronSearchByTags		<SID>SearchByTags
+			noremap <SID>SearchByTags		:<c-u>call search#SearchByTags()<cr>
+		endif
+		
 		" call vimneuro#Foobar()<cr>
 
 		let g:vimneuro_did_load_mappings = 1
