@@ -507,6 +507,7 @@ endfunction
 
 function! vimneuro#AddTag()
 	let l:input = trim(input("Enter tag(s): "))
+	redraw
 	if l:input ==# ""
 		echom "ERROR: No tag(s) supplied."
 		return
