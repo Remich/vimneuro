@@ -136,6 +136,7 @@ augroup vimneuro
 			autocmd Filetype markdown nmap <buffer><leader>nt	<Plug>NeuronAddTag
 			noremap <unique> <script> <Plug>NeuronAddTag		<SID>AddTag
 			noremap <SID>AddTag		:<c-u>call meta#AddTag()<cr>
+			command! -nargs=1 VNAddTag	:call meta#AddTag(<args>)
 		endif
 		
 		" Remove tag
@@ -143,6 +144,7 @@ augroup vimneuro
 			autocmd Filetype markdown nmap <buffer><leader>nT	<Plug>NeuronRemoveTag
 			noremap <unique> <script> <Plug>NeuronRemoveTag		<SID>RemoveTag
 			noremap <SID>RemoveTag		:<c-u>call meta#RemoveTag()<cr>
+			command! -nargs=1 VNRemoveTag	:call meta#RemoveTag(<args>)
 		endif
 
 		" Search by Tags
