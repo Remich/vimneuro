@@ -18,6 +18,7 @@ function! search#SearchByTags()
 	elseif l:input ==# "!"
 		" don't search, only invert
 		let l:only_invert = v:true
+		let l:exact       = '.*'
 		let l:neg         = v:true
 		let l:new_str     = "!"
 	else
@@ -67,9 +68,9 @@ function! search#SearchByTags()
 
 	if l:only_invert == v:true
 		if l:exact !=# ''
-			let g:searchquery = "!".g:searchquery
+			let g:searchquery = "!(".g:searchquery.")"
 		else
-			let g:searchquery = '!"'.g:searchquery.'"'
+			let g:searchquery = '!("'.g:searchquery.'")'
 		endif
 	elseif len(l:op) == 0
 		if l:exact !=# ''
@@ -82,18 +83,18 @@ function! search#SearchByTags()
 		call search#IntersectCurrentAndPreviousQfLists(l:qf_cur)
 
 		if l:exact !=# ''
-			let g:searchquery .= " & ".l:neg_str.l:tag
+			let g:searchquery =	"(".g:searchquery.")"." & ".l:neg_str.l:tag
 		else
-			let g:searchquery .= " & ".l:neg_str.'"'.l:tag.'"'
+			let g:searchquery = "(".g:searchquery.")"." & ".l:neg_str.'"'.l:tag.'"'
 		endif
 	elseif l:op[0] ==# '|'
 		" compute union of previous qflist with current
 		call search#UnionOfCurrentAndPreviousQfLists(l:qf_cur)
 
 		if l:exact !=# ''
-			let g:searchquery .= " | ".l:neg_str.l:tag
+			let g:searchquery = "(".g:searchquery.")"." | ".l:neg_str.l:tag
 		else
-			let g:searchquery .= " | ".l:neg_str.'"'.l:tag.'"'
+			let g:searchquery = "(".g:searchquery.")"." | ".l:neg_str.'"'.l:tag.'"'
 		endif
 	endif
 
