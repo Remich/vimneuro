@@ -5,6 +5,8 @@ function! utility#PrintOptions()
 	echom &grepprg
 	echom &grepformat
 	echom &cpo
+	echom &selection
+	pwd
 endfunction
 
 function! utility#SaveOptions()
@@ -12,6 +14,7 @@ function! utility#SaveOptions()
 	let g:vimneuro_save_options["grepformat"] = &grepformat
 	let g:vimneuro_save_options["cpo"]        = &cpo
 	let g:vimneuro_save_options["selection"]  = &selection
+	let g:vimneuro_save_options["cwd"]				= getcwd()
 endfunction
 
 function! utility#SetOptions()
@@ -26,6 +29,7 @@ function! utility#RestoreOptions()
 	let &grepformat = g:vimneuro_save_options["grepformat"]
 	let &cpo        = g:vimneuro_save_options["cpo"]
 	let &selection  = g:vimneuro_save_options["selection"]
+	execute "cd ".g:vimneuro_save_options["cwd"]
 endfunction
 
 function! utility#PrintRegisters()

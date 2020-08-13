@@ -34,12 +34,3 @@ function! meta#AddTag()
 	echom ""
 	call utility#RestoreRegisters()
 endfunction
-
-function! meta#AddCreated()
-	call utility#SaveRegisters(['z'])
-	let l:date = trim(system('date "+%Y-%m-%dT%H:%M"'))
-	let @z = "created: ".l:date."\n"
-	execute "normal! 1j\"zpG"
-	call utility#RestoreRegisters()
-endfunction
-

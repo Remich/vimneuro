@@ -1,6 +1,9 @@
 let g:searchquery = ""
 
 function! search#ByTags()
+	call utility#SaveOptions()
+	call utility#SetOptions()
+	
 	let l:input = trim(input("Search: "))
 	redraw!
 
@@ -101,6 +104,8 @@ function! search#ByTags()
 	call search#QfSanitize()
 	
 	echom "Current Search Query: ".g:searchquery
+	
+	call utility#RestoreOptions()
 endfunction
 
 function! search#HasSameFilename(e1, e2)
@@ -114,12 +119,15 @@ function! search#CmpQfByFilename(e1, e2)
 endfunction
 
 function! search#QfSanitize()
+	call utility#SaveOptions()
+	call utility#SetOptions()
 	
 	" get qflist
 	let l:qf = getqflist()
 	
 	" abort if no entries
 	if len(l:qf) == 0
+		call utility#RestoreOptions()
 		return
 	endif
 	
@@ -142,9 +150,12 @@ function! search#QfSanitize()
 	" sort by filename and set
 	call setqflist(sort(l:qf, 'search#CmpQfByFilename'))
 	
+	call utility#RestoreOptions()
 endfunction
 
 function! search#InvertMatches()
+	call utility#SaveOptions()
+	call utility#SetOptions()
 
 	" get list of all Zettels
 	let l:files = system('ls *.md')
@@ -158,14 +169,20 @@ function! search#InvertMatches()
 
 	" get the titles
 	execute 'silent! grep! "^\#{1} .*$" '.join(l:files, ' ') | execute 'redraw!'
+	
+	call utility#RestoreOptions()
 endfunction
 
 function! search#IntersectCurrentAndPreviousQfLists(qf_prev)
+	call utility#SaveOptions()
+	call utility#SetOptions()
+
 	let l:num_qflists = getqflist({'nr' : '$'}).nr
 	let l:num_cur     = getqflist({'nr' : 0}).nr
 	
 	if l:num_qflists == 1
 		" nothing to do
+		call utility#RestoreOptions()
 		return
 	endif
 	
@@ -181,7 +198,7 @@ function! search#IntersectCurrentAndPreviousQfLists(qf_prev)
 	endfor
 
 	call setqflist(l:new)
-	
+	call utility#RestoreOptions()
 endfunction
 
 function! search#UnionOfCurrentAndPreviousQfLists(qf_prev)

@@ -10,6 +10,7 @@ function! link#LinkingOperator(type)
 	elseif a:type ==# 'char'
 		normal! `[v`]y
 	else
+		call utility#RestoreOptions()
 		return
 	endif
 
@@ -129,6 +130,9 @@ endfunction
 
 " replaces links to Zettel 'oldname' with 'newname' in every Zettel
 function! link#Relink(oldname, newname)
+	call utility#SaveOptions()
+	call utility#SetOptions()
+
 	let l:curbuf    = bufnr()
 	let linkpattern = '<'.a:oldname.'(\?cf)?>'
 
@@ -145,6 +149,8 @@ function! link#Relink(oldname, newname)
 
 	" switch back to original buffer
 	execute "buffer ".l:curbuf	
+
+	call utility#RestoreOptions()
 	return v:true
 endfunction
 

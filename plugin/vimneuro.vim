@@ -7,10 +7,6 @@ if exists("g:vimneuro_load") && g:vimneuro_load == 0
 	finish
 endif
 
-" Save user options, for restoring at the end of the script.
-call utility#SaveOptions()
-call utility#SetOptions()
-
 if exists("g:vimneuro_path_zettelkasten") == v:false
 	let g:vimneuro_path_zettelkasten = "/home/".$USER."/zettelkasten"
 endif
@@ -23,6 +19,10 @@ endif
 if trim(system("whereis rg")) ==# "rg:"
 	echoe "ERRROR: ripgrep not found! A lot of stuff won't work. Please install rigrep."
 endif
+
+" Save user options, for restoring at the end of the script.
+call utility#SaveOptions()
+call utility#SetOptions()
 
 augroup vimneuro
 	autocmd!

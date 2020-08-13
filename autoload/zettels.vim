@@ -1,5 +1,6 @@
 function! zettels#TouchAndPrefill(title, name)
-
+	call utility#SaveOptions()
+	call utility#SetOptions()
 	call utility#SaveRegisters(['x', 'y', 'z'])
 
 	if a:name ==# ""
@@ -20,10 +21,13 @@ function! zettels#TouchAndPrefill(title, name)
 	silent execute "w!"
 
 	call utility#RestoreRegisters()
+	call utility#RestoreOptions()
 endfunction
 
 function! zettels#New(title)
-
+	call utility#SaveOptions()
+	call utility#SetOptions()
+	
 	" check argument
 	if a:title ==# ""
 		let l:title = trim(input("Enter title for new Zettel: "))
@@ -46,13 +50,14 @@ function! zettels#New(title)
 	execute "edit! ".l:filename
 	execute "normal G"
 	
+	call utility#RestoreOptions()
 endfunction
 
 function! zettels#ComputeNewZettelName(title)
 
 	let l:name = zettels#TransformTitleToName(a:title)
 
-	if zettels#Exists(l:name) == v:true
+	if zettels#Exists(l:name.".md") == v:true
 		return zettels#GetIncrementalFilename(l:name)
 	else
 		return l:name
@@ -95,12 +100,13 @@ function! zettels#GetIncrementalFilename(name)
 		let l:filename = l:name.".md"
 		let l:fullname = g:vimneuro_path_zettelkasten."/".l:filename
 	endwhile
-
+	
 	return l:name
 endfunction
 
-function! zettels#Exists(name)
-	let l:fullname = g:vimneuro_path_zettelkasten.'/'.a:name.'.md'
+function! zettels#Exists(filename)
+	let l:fullname = g:vimneuro_path_zettelkasten.'/'.a:filename
+
 	if filereadable(l:fullname) == v:true
 		return v:true
 	else
@@ -109,6 +115,9 @@ function! zettels#Exists(name)
 endfunction
 
 function! zettels#Delete()
+	call utility#SaveOptions()
+	call utility#SetOptions()
+	
 	let l:filename = expand('%:p')
 	let l:confirm  = confirm('Do you really want to delete Zettel '.shellescape(l:filename).'?', "&Yes\n&No")
 
@@ -124,24 +133,26 @@ function! zettels#Delete()
 				execute "buffer ".l:alternative
 			endif
 		endif
-	elseif l:confirm == 2
-		return
 	endif
+	
+	call utility#RestoreOptions()
 endfunction
 
 function! zettels#Rename(oldname, newname)
+	call utility#SaveOptions()
+	call utility#SetOptions()
 
 	" check if Zettel to rename really exists
-	" TODO use zettels#Exists
-	if filereadable(a:oldname) == v:false
+	if zettels#Exists(a:oldname) == v:false
 		echom "ERROR: Zettel with name '".a:oldname."' does not exists!"
+		call utility#RestoreOptions()
 		return v:false
 	endif
 
-	" TODO use zettels#Exists
 	" check for existing Zettel with supplied name
-	if filereadable(a:newname) == v:true
+	if zettels#Exists(a:newname) == v:true
 		echom "ERROR: Zettel with name '".a:newname."' already exists!"
+		call utility#RestoreOptions()
 		return v:false
 	endif
 
@@ -149,6 +160,7 @@ function! zettels#Rename(oldname, newname)
 	if rename(a:oldname, a:newname) == 0
 		return v:true
 	else
+		call utility#RestoreOptions()
 		return v:false
 	endif
 
@@ -163,13 +175,18 @@ function! zettels#WarningModifiedBuffers()
 		else
 			return v:false
 		endif
+	else
+		return v:true
 	endif
 endfunction
 
 function! zettels#RenameCurrent()
+	call utility#SaveOptions()
+	call utility#SetOptions()
 
 	" check for modified/unwritten buffers
 	if zettels#WarningModifiedBuffers() == v:false
+		call utility#RestoreOptions()
 		return
 	endif
 	
@@ -187,6 +204,7 @@ function! zettels#RenameCurrent()
 	" check for valid name
 	if match(l:newname, '[^A-Za-z0-9-_]') != -1
 		echom "ERROR: '".l:newname."' is not a valid Zettel name. Allowed Characters: [A-Za-z0-9-_]"
+		call utility#RestoreOptions()
 		return
 	endif
 
@@ -200,12 +218,16 @@ function! zettels#RenameCurrent()
 		call link#Relink(l:oldlink, l:newname)
 	endif
 
+	call utility#RestoreOptions()
 endfunction
 
 function! zettels#RenameCurrentZettelToTitle(...)
+	call utility#SaveOptions()
+	call utility#SetOptions()
 
 	" check for modified/unwritten buffers
 	if zettels#WarningModifiedBuffers() == v:false
+		call utility#RestoreOptions()
 		return
 	endif
 
@@ -227,6 +249,7 @@ function! zettels#RenameCurrentZettelToTitle(...)
 	let l:title = parse#GetZettelTitle()
 	if l:title == v:false
 		echom "ERROR: No title found!"
+		call utility#RestoreOptions()
 		return
 	endif
 
@@ -237,6 +260,7 @@ function! zettels#RenameCurrentZettelToTitle(...)
 	let l:basename = substitute(l:filename, '\v\.md', '', "")
 	if l:newname ==# l:basename
 		echom "Nothing to do."
+		call utility#RestoreOptions()
 		return
 	endi
 
@@ -258,8 +282,8 @@ function! zettels#RenameCurrentZettelToTitle(...)
 			" update all links
 			call link#Relink(l:basename, l:newname)
 		endif
-
-	else
-		return
+		
 	endif
+	
+	call utility#RestoreOptions()
 endfunction

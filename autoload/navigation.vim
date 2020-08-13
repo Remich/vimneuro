@@ -1,8 +1,12 @@
 function! navigation#Go()
+	call utility#SaveOptions()
+	call utility#SetOptions()
+	
 	let l:word = expand("<cWORD>")
 
 	" check if this is a valid Neuron link
 	if match(l:word, '\v\<[A-Za-z0-9-_]+(\?cf)?\>') == -1
+		call utility#RestoreOptions()
 		return
 	endif
 
@@ -15,11 +19,14 @@ function! navigation#Go()
 	let l:fullname = g:vimneuro_path_zettelkasten."/".l:filename
 	if filereadable(l:fullname) == v:false
 		echom "ERROR: Zettel with name '".l:fullname."' does not exist!"
+		call utility#RestoreOptions()
 		return
 	endif
 
 	" open Zettel in current window
 	execute "edit! ".l:filename
+	
+	call utility#RestoreOptions()
 endfunction
 
 function! navigation#Preview()
