@@ -9,28 +9,42 @@ function! meta#AddTag()
 	let l:tags = split(l:input, '\v;')
 	call map(l:tags, 'trim(v:val)')
 
-	call utility#SaveRegisters(['z', 'y'])
-
-	let @z = ""
-	for i in l:tags
-		let @z = @z."- ".i."\n"
-	endfor
-
-	mark `
-
-	" check if the Zettel already has some tags
-	let l:taglinenum = parse#HasZettelMetaDataTag()
-	if l:taglinenum == v:false
-		let l:insertafterlinenum = meta#GetZettelMetaDataEnd()
-		let @y = "tags:\n"
-		execute "normal! ".l:insertafterlinenum."gg\<esc>\"yp"
-		let l:insertafterlinenum += 1
-	else
-		let l:insertafterlinenum = parse#GetZettelMetaDataTagEnd(l:taglinenum)
+	" parse meta data
+	let l:meta = parse#MetaData()
+	if l:meta == {}
+		return
 	endif
 
-	execute "normal! ".l:insertafterlinenum."gg\<esc>\"zp``"	
+	" adding
+	call extend(l:meta['tags'], l:tags)
+	call uniq(sort(l:meta['tags']))
 
-	echom ""
-	call utility#RestoreRegisters()
+	call write#MetaData(l:meta)
+	return
+endfunction
+
+function! meta#RemoveTag()
+	let l:input = trim(input("Enter tag(s): "))
+	redraw
+	if l:input ==# ""
+		echom "ERROR: No tag(s) supplied."
+		return
+	endif
+
+	let l:tags = split(l:input, '\v;')
+	call map(l:tags, 'trim(v:val)')
+
+	" parse meta data
+	let l:meta = parse#MetaData()
+	if l:meta == {}
+		return
+	endif
+
+	" removing
+	for i in l:tags
+		call filter(l:meta['tags'], 'v:val !=# i')
+	endfor
+	
+	call write#MetaData(l:meta)
+	return
 endfunction

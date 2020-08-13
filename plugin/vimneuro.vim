@@ -137,6 +137,13 @@ augroup vimneuro
 			noremap <unique> <script> <Plug>NeuronAddTag		<SID>AddTag
 			noremap <SID>AddTag		:<c-u>call meta#AddTag()<cr>
 		endif
+		
+		" Remove tag
+		if !hasmapto('<Plug>NeuronRemoveTag')
+			autocmd Filetype markdown nmap <buffer><leader>nT	<Plug>NeuronRemoveTag
+			noremap <unique> <script> <Plug>NeuronRemoveTag		<SID>RemoveTag
+			noremap <SID>RemoveTag		:<c-u>call meta#RemoveTag()<cr>
+		endif
 
 		" Search by Tags
 		if !hasmapto('<Plug>NeuronSearchByTags')
