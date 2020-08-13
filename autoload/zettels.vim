@@ -154,8 +154,26 @@ function! zettels#Rename(oldname, newname)
 
 endfunction
 
+" checks if there are modified buffers and displays a warning message
+function! zettels#WarningModifiedBuffers()
+	if len(getbufinfo({'bufmodified': 1})) > 0
+		let l:confirm = confirm("WARNING: One or more modified buffers exist. To avoid broken links save all changes before proceeding. Do you want to proceed?", "&yes\n&no")
+		if l:confirm == 1
+			return v:true
+		else
+			return v:false
+		endif
+	endif
+endfunction
+
 function! zettels#RenameCurrent()
 
+	" check for modified/unwritten buffers
+	if zettels#WarningModifiedBuffers() == v:false
+		return
+	endif
+	
+	" input dialog
 	let l:oldname = bufname()
 	let l:newname = input("Enter new name: ")
 	redraw
@@ -186,6 +204,11 @@ endfunction
 
 function! zettels#RenameCurrentZettelToTitle(...)
 
+	" check for modified/unwritten buffers
+	if zettels#WarningModifiedBuffers() == v:false
+		return
+	endif
+
 	" per default, always confirm
 	let l:dont_confirm = v:false
 
@@ -208,11 +231,6 @@ function! zettels#RenameCurrentZettelToTitle(...)
 	endif
 
 	let l:newname = zettels#TransformTitleToName(l:title)
-
-	if l:newname ==# ""
-		echom "ERROR: Title is empty!"
-		return
-	endif
 
 	" abort, if name of Zettel is already the same as the title
 	let l:filename = expand('%')	
