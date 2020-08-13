@@ -11,18 +11,21 @@ function! utility#SaveOptions()
 	let g:vimneuro_save_options["grepprg"]    = &grepprg
 	let g:vimneuro_save_options["grepformat"] = &grepformat
 	let g:vimneuro_save_options["cpo"]        = &cpo
+	let g:vimneuro_save_options["selection"]  = &selection
 endfunction
 
 function! utility#SetOptions()
 	set grepprg=rg\ --vimgrep\ --smart-case
 	set grepformat^=%f:%l:%c:%m
 	set cpo&vim
+	set selection=inclusive
 endfunction
 
 function! utility#RestoreOptions()
 	let &grepprg    = g:vimneuro_save_options["grepprg"]
 	let &grepformat = g:vimneuro_save_options["grepformat"]
 	let &cpo        = g:vimneuro_save_options["cpo"]
+	let &selection  = g:vimneuro_save_options["selection"]
 endfunction
 
 function! utility#PrintRegisters()

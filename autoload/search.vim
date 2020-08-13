@@ -1,6 +1,6 @@
 let g:searchquery = ""
 
-function! search#SearchByTags()
+function! search#ByTags()
 	let l:input = trim(input("Search: "))
 	redraw!
 
