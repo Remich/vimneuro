@@ -1,8 +1,6 @@
 function! zettels#Create(...)
 
-	let l:save_reg_z = @z
-	let l:save_reg_y = @y
-	let l:save_reg_x = @x
+	call utility#SaveRegisters(['x', 'y', 'z'])
 
 	let l:filename = sha256(strftime('%s%N'))[0:7].'.md'
 	let l:date     = strftime('%F')
@@ -23,9 +21,7 @@ function! zettels#Create(...)
 	execute "normal! \"xp2o"
 	silent execute "w!"
 
-	let @z = l:save_reg_z
-	let @y = l:save_reg_y
-	let @x = l:save_reg_x
+	call utility#RestoreRegisters()
 	
 	return l:filename
 endfunction

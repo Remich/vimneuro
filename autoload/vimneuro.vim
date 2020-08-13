@@ -23,11 +23,11 @@ function! vimneuro#GoZettel()
 endfunction
 
 function! vimneuro#InsertMetaDataCreated()
-	let l:reg_save = @z
+	call utility#SaveRegisters(['z'])
 	let l:date = trim(system('date "+%Y-%m-%dT%H:%M"'))
 	let @z = "created: ".l:date."\n"
 	execute "normal! 1j\"zpG"
-	let @z = l:reg_save
+	call utility#RestoreRegisters()
 endfunction
 
 function! vimneuro#TransformTitleToName(title)
@@ -278,10 +278,6 @@ function! vimneuro#CreateLinkOfFilename(filename)
 	return "<" . substitute(a:filename, '\.md', '', "") .">"
 endfunction
 
-function! vimneuro#PasteLinkAsUlItem()
-	execute "normal! o\<esc>\"_d0i- \<c-r>+\<esc>"
-endfunction
-
 function! vimneuro#GetLinkToAlternateBuffer()
 	let l:filename = bufname(0)
 
@@ -301,11 +297,13 @@ function! vimneuro#InsertLinkToAlternateBuffer()
 endfunction
 
 function! vimneuro#InsertLinkToAlternateBufferAsUlItem()
+	call utility#SaveRegisters(['+'])	
 	let l:link = vimneuro#GetLinkToAlternateBuffer()
 	if l:link != v:false
 		let @+ = l:link
-		call vimneuro#PasteLinkAsUlItem()
+		execute "normal! o\<esc>\"_d0i- \<c-r>+\<esc>"
 	endif
+	call utility#RestoreRegisters()
 endfunction
 
 function! vimneuro#GetIncrementalFilename(name)
@@ -324,10 +322,10 @@ endfunction
 
 " create a neuron link to the zettel matching the text
 function! vimneuro#LinkingOperator(type)
+	" TODO save with utility
 	let sel_save = &selection
 	let &selection = "inclusive"
-	let reg_save_1 = @@
-	let reg_save_2 = @k
+	call utility#SaveRegisters(['@', 'k'])
 
 	if a:type ==# 'v'
 		normal! `<v`>y
@@ -365,8 +363,7 @@ function! vimneuro#LinkingOperator(type)
 	endif
 
 	let &selection = sel_save
-	let @@ = reg_save_1
-	let @k = reg_save_2
+	call utility#RestoreRegisters()
 endfunction
 
 function! vimneuro#CopyLinkOfCurrentBuffer()
@@ -482,7 +479,7 @@ function! vimneuro#AddTag()
 	let l:tags = split(l:input, '\v;')
 	call map(l:tags, 'trim(v:val)')
 
-	let l:regsave = @z
+	call utility#SaveRegisters(['z', 'y'])
 
 	let @z = ""
 	for i in l:tags
@@ -495,10 +492,8 @@ function! vimneuro#AddTag()
 	let l:taglinenum = vimneuro#HasZettelMetaDataTag()
 	if l:taglinenum == v:false
 		let l:insertafterlinenum = vimneuro#GetZettelMetaDataEnd()
-		let l:regsave_1 = @y
 		let @y = "tags:\n"
 		execute "normal! ".l:insertafterlinenum."gg\<esc>\"yp"
-		let @y = l:regsave_1
 		let l:insertafterlinenum += 1
 	else
 		let l:insertafterlinenum = vimneuro#GetZettelMetaDataTagEnd(l:taglinenum)
@@ -507,5 +502,5 @@ function! vimneuro#AddTag()
 	execute "normal! ".l:insertafterlinenum."gg\<esc>\"zp``"	
 
 	echom ""
-	let @z = l:regsave
+	call utility#RestoreRegisters()
 endfunction

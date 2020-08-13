@@ -7,9 +7,9 @@ if exists("g:vimneuro_load") && g:vimneuro_load == 0
 	finish
 endif
 
-" Save user's options, for restoring at the end of the script.
-let s:save_cpo = &cpo
-set cpo&vim
+" Save user options, for restoring at the end of the script.
+call utility#SaveOptions()
+call utility#SetOptions()
 
 if exists("g:vimneuro_path_zettelkasten") == v:false
 	let g:vimneuro_path_zettelkasten = "/home/".$USER."/zettelkasten"
@@ -146,6 +146,5 @@ augroup vimneuro
 	endif
 augroup END
 
-" Restore user's options.
-let &cpo = s:save_cpo
-unlet s:save_cpo
+" restore user options
+call utility#RestoreOptions()
