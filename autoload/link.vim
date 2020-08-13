@@ -28,7 +28,7 @@ function! link#LinkingOperator(type)
 
 	elseif len(l:results) > 1
 		" TODO selection prompt, instead of error
-		echoe "ERROR: Multiple Zettels with title (".shellescape(l:title).") found."
+		echoe "ERROR: Multiple Zettels with title ".shellescape(l:title)." found."
 	else
 		let d = l:results[0]
 		let l:basename = trim(system('basename '.shellescape(bufname(d.bufnr))))
@@ -48,7 +48,7 @@ function! link#GetLinkToAlternateBuffer()
 	let l:filename = bufname(0)
 
 	if l:filename ==# ""
-		echom "ERROR: No alternative buffer"
+		echom "ERROR: No alternative buffer!"
 		return v:false
 	endif
 
@@ -75,24 +75,30 @@ endfunction
 function! link#CopyLinkOfCurrentBuffer()
 	let l:filename = substitute(expand('%'), '\v\.md', '', "")
 	let @+ = "<".l:filename.">"
-	echom "'<".l:filename.">' copied to + register"
+	echom "Copied '<".l:filename.">' to + register."
 endfunction
 
 function! link#CopyLinkOfCurrentLine(linenum)
 	let l:link = link#GetLinkOfCurrentLine(a:linenum)	
+
+	if l:link == v:false
+		echom "No names of Markdown files in current line found!"
+		return
+	endif
+	
 	let @+ = l:link
-	echom "'".l:link."' copied to + register"
+	echom "'Copied ".l:link."' + register."
 endfunction
 
-" searches for `FOOBAR.md` in the current line,
+" searches for the first occurence of `FOOBAR.md` in the current line,
 " creates and returns a Neuron link
 function! link#GetLinkOfCurrentLine(linenum)
 	let l:line     = getline(a:linenum)
 	let l:filename = []
-	call substitute(l:line, '\v(^|\s)\zs[a-z0-9]+\ze\.md', '\=add(l:filename, submatch(0))', 'g')
+	call substitute(l:line, '\v\zs[A-Za-z0-9-_]+\ze\.md', '\=add(l:filename, submatch(0))', 'g')
 
 	if len(l:filename) == 0
-		return
+		return v:false
 	endif
 
 	let l:links = map(l:filename, '"<".v:val.">"')
@@ -104,15 +110,21 @@ function! link#CopyLinkOfSelection()
 	let l:stop  = getpos("'>")
 	let l:lines = range(l:start[1], l:stop[1])
 	let l:links = map(l:lines, 'link#GetLinkOfCurrentLine(v:val)')
-	let str = ""
+	let l:str = ""
 	for i in l:links
 		if i == v:false
 			continue
 		endif
-		let str = str.i."\n"	
+		let l:str = l:str.i."\n"	
 	endfor
-	let @+ = str
-	echom "Copied links to + register"
+	let @+ = l:str
+
+	if l:str ==# ""
+		echom "No names of Markdown files in selection found!"
+		return
+	endif
+	
+	echom "Copied links to + register."
 endfunction
 
 " replaces links to Zettel 'oldname' with 'newname' in every Zettel

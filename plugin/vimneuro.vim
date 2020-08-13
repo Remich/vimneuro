@@ -72,7 +72,7 @@ augroup vimneuro
 
 		" Insert link of alternate file as unordered list item below the current line
 		if !hasmapto('<Plug>NeuronInsertLinkToAlternateBufferAsUlItem')
-			autocmd Filetype markdown nmap <buffer><leader>a<c-v>	<Plug>NeuronInsertLinkToAlternateBufferAsUlItem
+			autocmd Filetype markdown nmap <buffer><leader>ap		<Plug>NeuronInsertLinkToAlternateBufferAsUlItem
 			noremap <unique> <script> <Plug>NeuronInsertLinkToAlternateBufferAsUlItem		<SID>InsertLinkToAlternateBufferAsUlItem
 			noremap <SID>InsertLinkToAlternateBufferAsUlItem		:<c-u>call link#InsertLinkToAlternateBufferAsUlItem()<cr>
 		endif
@@ -100,21 +100,21 @@ augroup vimneuro
 
 		" Paste link as unordered list item below the current line
 		if !hasmapto('<Plug>NeuronPasteLinkAsUlItem')
-			autocmd Filetype markdown nmap <buffer><leader><c-v>	<Plug>NeuronPasteLinkAsUlItem
+			autocmd Filetype markdown nmap <buffer><leader>p	<Plug>NeuronPasteLinkAsUlItem
 			noremap <unique> <script> <Plug>NeuronPasteLinkAsUlItem		<SID>PastLinkAsUlItem
 			noremap <SID>PastLinkAsUlItem		:<c-u>call link#PasteLinkAsUlItem()<cr>
 		endif
 
 		" Create & copy link of first filename in current line
 		if !hasmapto('<Plug>NeuronCopyLinkOfCurrentLine')
-			autocmd Filetype * nmap <buffer><leader>ncl	<Plug>NeuronCopyLinkOfCurrentLine
+			autocmd Filetype markdown,qf nmap <buffer><leader>C		<Plug>NeuronCopyLinkOfCurrentLine
 			noremap <unique> <script> <Plug>NeuronCopyLinkOfCurrentLine		<SID>CopyLinkOfCurrentLine
 			noremap <SID>CopyLinkOfCurrentLine		:<c-u>call link#CopyLinkOfCurrentLine(line('.'))<cr>
 		endif
 
 		" Create & copy link of first filename in current visual selection
 		if !hasmapto('<Plug>NeuronCopyLinkOfSelection')
-			autocmd Filetype * vmap <buffer><leader>ncl	<Plug>NeuronCopyLinkOfSelection
+			autocmd Filetype markdown,qf vmap <buffer><leader>C		<Plug>NeuronCopyLinkOfSelection
 			noremap <unique> <script> <Plug>NeuronCopyLinkOfSelection		<SID>CopyLinkOfSelection
 			noremap <SID>CopyLinkOfSelection		:<c-u>call link#CopyLinkOfSelection()<cr>
 		endif
