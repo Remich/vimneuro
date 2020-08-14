@@ -21,6 +21,12 @@ else
 	let g:vimneuro_random_names = v:false
 endif
 
+if exists("g:vimneuro_insert_created") == v:true && g:vimneuro_insert_created == 1
+	let g:vimneuro_insert_created = v:true
+else
+	let g:vimneuro_insert_created = v:false
+endif
+
 " check if 'ripgrep' is installed
 if trim(system("whereis rg")) ==# "rg:"
 	echoe "ERRROR: ripgrep not found! A lot of stuff won't work. Please install rigrep."

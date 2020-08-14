@@ -1,20 +1,28 @@
+" touch Zettel and write some meta data and the title to it
 function! zettels#TouchAndPrefill(title, name)
 	call utility#SaveOptions()
 	call utility#SetOptions()
-	call utility#SaveRegisters(['x', 'y', 'z'])
 	
-	let @x = "# ".a:title
-	let @z = strftime('%F')
-	let @y = strftime('%FT%H:%H') 
+	let l:title   = "# ".a:title
+	let l:date    = strftime('%F')
 	
 	execute "edit! ".a:name
-	execute "normal! i---\<cr>date: \<esc>\"zpo"
-	execute "normal! icreated: \<esc>\"ypo"
-	execute "normal! i---\<esc>2o"
-	execute "normal! \"xp2o"
+
+	let i = 0
+
+	call append(i, '---') | let i += 1
+	call append(i, 'date: '. l:date) | let i += 1
+	if g:vimneuro_insert_created == v:true
+		let l:created = strftime('%FT%H:%H')
+		call append(i, 'created: '. l:created) | let i += 1
+	endif
+	call append(i, '---') | let i += 1
+	call append(i, '') | let i += 1
+	call append(i, l:title) | let i += 1
+	call append(i, '') | let i += 1
+	
 	silent execute "w!"
 
-	call utility#RestoreRegisters()
 	call utility#RestoreOptions()
 endfunction
 
