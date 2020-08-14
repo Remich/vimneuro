@@ -1,4 +1,6 @@
 function! write#MetaData(meta)
+
+	echom a:meta
 	
 	" write date
 	if a:meta['date']['val'] != -1
@@ -13,7 +15,12 @@ function! write#MetaData(meta)
 	endif
 
 	" write tags
-	let l:i = a:meta['tags_start'] - 1
+	if a:meta['tags_start'] == -1
+		let l:i = a:meta['end'] - 1
+	else
+		let l:i = a:meta['tags_start'] - 1
+	endif
+
 	" remove old tags
 	call deletebufline(bufname(), a:meta['tags_start'], a:meta['tags_end'])
 	
