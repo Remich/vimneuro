@@ -55,17 +55,21 @@ function! zettels#New(title)
 	call utility#RestoreOptions()
 endfunction
 
-function! zettels#GenerateRandomName()
-	return sha256(strftime('%s%N'))[0:7]
+function! zettels#GenerateRandomName(in)
+	if a:in ==# ""
+		return sha256(strftime('%s'))[0:7]
+	else
+		return sha256(a:in)[0:7]
+	endif
 endfunction
 
 function! zettels#ComputeNewZettelName(title)
 
 	if g:vimneuro_random_names == v:true
 		
-		let l:name = zettels#GenerateRandomName()
+		let l:name = zettels#GenerateRandomName("")
 		while zettels#Exists(l:name.".md") == v:true
-			let l:name = zettels#GenerateRandomName()
+			let l:name = zettels#GenerateRandomName(l:name)
 		endwhile
 		return l:name
 		
