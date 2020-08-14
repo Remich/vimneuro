@@ -64,13 +64,10 @@ function! link#InsertLinkToAlternateBuffer()
 endfunction
 
 function! link#InsertLinkToAlternateBufferAsUlItem()
-	call utility#SaveRegisters(['+'])	
 	let l:link = link#GetLinkToAlternateBuffer()
 	if l:link != v:false
-		let @+ = l:link
-		execute "normal! o\<esc>\"_d0i- \<c-r>+\<esc>"
+		call append(line('.')-1, "- ".l:link)
 	endif
-	call utility#RestoreRegisters()
 endfunction
 
 function! link#CopyLinkOfCurrentBuffer()
