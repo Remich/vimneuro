@@ -111,8 +111,15 @@ function! parse#MetaData()
 			
 		elseif l:state ==# 'parsing_tags'
 
+			" is line regular meta data (key: value)?
+			if match(l:curline, '\v^[^:]+: .*$') != -1
+				let l:meta['tags_end'] = l:i - 1
+				let l:state = 'parsing_meta'
+				continue
+			endif
+
 			" check for missing '-'
-			if match(l:curline, '\v^- .*$') == -1
+			if match(l:curline, '\v(^- .*$)') == -1
 				echoe "Parsing of '".l:filename."' failed! Missing '- ' in line ".l:i
 				return {}
 			endif
@@ -202,4 +209,3 @@ function! parse#GetZettelMetaDataEnd()
 	endwhile
 	return l:curlinenum - 1
 endfunction
-
