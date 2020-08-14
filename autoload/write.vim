@@ -1,6 +1,4 @@
 function! write#MetaData(meta)
-
-	echom a:meta
 	
 	" write date
 	if a:meta['date']['val'] != -1
