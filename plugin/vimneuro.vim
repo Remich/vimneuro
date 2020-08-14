@@ -153,10 +153,18 @@ augroup vimneuro
 		
 		" Remove tag
 		if !hasmapto('<Plug>NeuronRemoveTag')
-			autocmd Filetype markdown nmap <buffer><leader>nT	<Plug>NeuronRemoveTag
+			autocmd Filetype markdown nmap <buffer><leader>nTr <Plug>NeuronRemoveTag
 			noremap <unique> <script> <Plug>NeuronRemoveTag		<SID>RemoveTag
 			noremap <SID>RemoveTag		:<c-u>call meta#RemoveTag()<cr>
 			command! -nargs=1 VNRemoveTag	:call meta#RemoveTag(<args>)
+		endif
+		
+		" Sort tags
+		if !hasmapto('<Plug>NeuronSortTags')
+			autocmd Filetype markdown nmap <buffer><leader>nTs <Plug>NeuronSortTags
+			noremap <unique> <script> <Plug>NeuronSortTags		<SID>SortTags
+			noremap <SID>SortTags		:<c-u>call meta#SortTags()<cr>
+			command! -nargs=* VNSortTags	:call meta#SortTags()
 		endif
 
 		" Search by Tags

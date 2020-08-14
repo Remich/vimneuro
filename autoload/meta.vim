@@ -72,5 +72,18 @@ function! meta#RemoveTag(...)
 	endfor
 	
 	call write#MetaData(l:meta)
-	return
+
+endfunction
+
+function! meta#SortTags()
+	
+	" parse meta data
+	let l:meta = parse#MetaData()
+	if l:meta == {}
+		return
+	endif
+
+	call sort(l:meta['tags'])
+	call write#MetaData(l:meta)
+	
 endfunction
