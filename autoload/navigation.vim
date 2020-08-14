@@ -6,17 +6,45 @@ function! navigation#Go()
 
 	" check if this is a valid Neuron link
 	if match(l:word, '\v\<[A-Za-z0-9-_]+(\?cf)?\>') == -1
-		call utility#RestoreOptions()
-		return
+		" no, then check if there are any links in the current line
+
+		let l:names = []
+		call substitute(getline(line('.')), '\v\<([A-Za-z0-9-_]+(\?cf)?)\>', '\=add(l:names, submatch(1))', 'g')
+
+		if len(l:names) == 0
+			" no links on current line, exit
+			call utility#RestoreOptions()
+			return
+		endif
+			
+	else
+		" extract Zettel name(s)
+		let l:names = []
+		call substitute(l:word, '\v\<([A-Za-z0-9-_]+(\?cf)?)\>', '\=add(l:names, submatch(1))', 'g')
 	endif
 
-	" extract filename
-	let l:filename = []
-	call substitute(l:word, '\v\<\zs.*\ze(\?cf)?\>', '\=add(l:filename, submatch(0))', 'g')
-	let l:filename = l:filename[0].".md"
+	if len(l:names) == 1
+		" <cWORD> only contains one link
+		let l:name = l:names[0]
+	else
+		" <cWORD> contains more than one link
+		let i = 1
+		let l:links = []
+		for l in l:names
+			call add(l:links, i.'. '.l)
+			let i += 1
+		endfor
+		
+		let l:list   = extend(['Multiple links under cursor. Select link:'], l:links)
+		let l:choice = inputlist(l:list)
+		let l:name   = l:names[l:choice-1]
+		execute "redraw!"
+	endif
 
-	" check for existing Zettel with supplied name
+	let l:filename = l:name.'.md'
 	let l:fullname = g:vimneuro_path_zettelkasten."/".l:filename
+	
+	" check for existing Zettel with supplied name
 	if filereadable(l:fullname) == v:false
 		echom "ERROR: Zettel with name '".l:fullname."' does not exist!"
 		call utility#RestoreOptions()
