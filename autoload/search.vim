@@ -1,8 +1,9 @@
-let g:searchquery = ""
+let g:vimneuro_search_query = ""
 
 function! search#ByTags()
 	call utility#SaveOptions()
 	call utility#SetOptions()
+	call utility#SaveCfStack()
 	
 	let l:input = trim(input("Search: "))
 	redraw!
@@ -71,39 +72,39 @@ function! search#ByTags()
 
 	if l:only_invert == v:true
 		if l:exact !=# ''
-			let g:searchquery = "!(".g:searchquery.")"
+			let g:vimneuro_search_query = "!(".g:vimneuro_search_query.")"
 		else
-			let g:searchquery = '!("'.g:searchquery.'")'
+			let g:vimneuro_search_query = '!("'.g:vimneuro_search_query.'")'
 		endif
 	elseif len(l:op) == 0
 		if l:exact !=# ''
-			let g:searchquery = l:neg_str.l:tag
+			let g:vimneuro_search_query = l:neg_str.l:tag
 		else
-			let g:searchquery = l:neg_str.'"'.l:tag.'"'
+			let g:vimneuro_search_query = l:neg_str.'"'.l:tag.'"'
 		endif
 	elseif l:op[0] ==# '&'
 		" compute intersection of previous qflist with current
 		call search#IntersectCurrentAndPreviousQfLists(l:qf_cur)
 
 		if l:exact !=# ''
-			let g:searchquery =	"(".g:searchquery.")"." & ".l:neg_str.l:tag
+			let g:vimneuro_search_query =	"(".g:vimneuro_search_query.")"." & ".l:neg_str.l:tag
 		else
-			let g:searchquery = "(".g:searchquery.")"." & ".l:neg_str.'"'.l:tag.'"'
+			let g:vimneuro_search_query = "(".g:vimneuro_search_query.")"." & ".l:neg_str.'"'.l:tag.'"'
 		endif
 	elseif l:op[0] ==# '|'
 		" compute union of previous qflist with current
 		call search#UnionOfCurrentAndPreviousQfLists(l:qf_cur)
 
 		if l:exact !=# ''
-			let g:searchquery = "(".g:searchquery.")"." | ".l:neg_str.l:tag
+			let g:vimneuro_search_query = "(".g:vimneuro_search_query.")"." | ".l:neg_str.l:tag
 		else
-			let g:searchquery = "(".g:searchquery.")"." | ".l:neg_str.'"'.l:tag.'"'
+			let g:vimneuro_search_query = "(".g:vimneuro_search_query.")"." | ".l:neg_str.'"'.l:tag.'"'
 		endif
 	endif
 
 	call search#QfSanitize()
 	
-	echom "Current Search Query: ".g:searchquery
+	echom "Current Search Query: ".g:vimneuro_search_query
 	
 	call utility#RestoreOptions()
 endfunction
@@ -127,6 +128,7 @@ function! search#QfSanitize()
 	
 	" abort if no entries
 	if len(l:qf) == 0
+		call utility#RestoreCfStack(l:qf, g:vimneuro_search_query)
 		call utility#RestoreOptions()
 		return
 	endif
@@ -148,8 +150,9 @@ function! search#QfSanitize()
 	call uniq(l:qf, 'search#HasSameFilename')
 	
 	" sort by filename and set
-	call setqflist(sort(l:qf, 'search#CmpQfByFilename'))
+	call sort(l:qf, 'search#CmpQfByFilename')
 	
+	call utility#RestoreCfStack(l:qf, g:vimneuro_search_query)
 	call utility#RestoreOptions()
 endfunction
 

@@ -1,5 +1,6 @@
-let g:vimneuro_save_options = {}
+let g:vimneuro_save_options   = {}
 let g:vimneuro_save_registers = {}
+let g:vimneuro_save_cf_id     = -1
 
 function! utility#PrintOptions()
 	echom &grepprg
@@ -50,4 +51,50 @@ function! utility#RestoreRegisters()
 		call setreg(key, g:vimneuro_save_registers[key])
 	endfor
 	let g:vimneuro_save_registers = {}
+endfunction
+
+function! utility#SaveCfStack()
+	
+	" check if there are any qflists
+  if getqflist({'nr' : '$'}).nr == 0
+		" no, abort
+		return
+	endif
+		
+	" get id of current qflist
+	let l:qfid = getqflist({'id' : 0}).id
+	
+	" save
+	let g:vimneuro_save_cf_id = l:qfid
+endfunction
+
+function! utility#RestoreCfStack(qflist, title)
+	
+	" no previous list
+	if g:vimneuro_save_cf_id == -1
+		" empty whole stack
+		call setqflist([], 'f')
+		" add new list on top of stack
+		call setqflist(a:qflist)
+		return
+	endif
+		
+	" get id of current list
+	let l:cur_qfid = getqflist({'id': 0}).id
+
+	while l:cur_qfid != g:vimneuro_save_cf_id
+		" free current list
+		call setqflist([], 'r')
+		" go to previous list
+		silent colder
+		" get id of current list
+		let l:cur_qfid = getqflist({'id': 0}).id
+	endwhile
+	
+	" add new list on top of stack
+	call setqflist(a:qflist)
+	
+	" set title
+	call setqflist([], 'r', { 'title' : a:title })
+		
 endfunction
