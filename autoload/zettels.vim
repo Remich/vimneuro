@@ -2,18 +2,12 @@ function! zettels#TouchAndPrefill(title, name)
 	call utility#SaveOptions()
 	call utility#SetOptions()
 	call utility#SaveRegisters(['x', 'y', 'z'])
-
-	if a:name ==# ""
-		let l:filename = sha256(strftime('%s%N'))[0:7].'.md'
-	else
-		let l:filename = a:name
-	endif
 	
 	let @x = "# ".a:title
 	let @z = strftime('%F')
 	let @y = strftime('%FT%H:%H') 
 	
-	execute "edit! ".l:filename
+	execute "edit! ".a:name
 	execute "normal! i---\<cr>date: \<esc>\"zpo"
 	execute "normal! icreated: \<esc>\"ypo"
 	execute "normal! i---\<esc>2o"
@@ -53,14 +47,29 @@ function! zettels#New(title)
 	call utility#RestoreOptions()
 endfunction
 
+function! zettels#GenerateRandomName()
+	return sha256(strftime('%s%N'))[0:7]
+endfunction
+
 function! zettels#ComputeNewZettelName(title)
 
-	let l:name = zettels#TransformTitleToName(a:title)
-
-	if zettels#Exists(l:name.".md") == v:true
-		return zettels#GetIncrementalFilename(l:name)
-	else
+	if g:vimneuro_random_names == v:true
+		
+		let l:name = zettels#GenerateRandomName()
+		while zettels#Exists(l:name.".md") == v:true
+			let l:name = zettels#GenerateRandomName()
+		endwhile
 		return l:name
+		
+	else
+		
+		let l:name = zettels#TransformTitleToName(a:title)
+		if zettels#Exists(l:name.".md") == v:true
+			return zettels#GetIncrementalFilename(l:name)
+		else
+			return l:name
+		endif
+		
 	endif
 
 endfunction

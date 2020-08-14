@@ -15,6 +15,12 @@ if exists("g:vimneuro_url_zettelkasten") == v:false
 	let g:vimneuro_url_zettelkasten = "http://localhost/zettelkasten"
 endif
 
+if exists("g:vimneuro_random_names") == v:true && g:vimneuro_random_names == 1
+	let g:vimneuro_random_names = v:true
+else
+	let g:vimneuro_random_names = v:false
+endif
+
 " check if 'ripgrep' is installed
 if trim(system("whereis rg")) ==# "rg:"
 	echoe "ERRROR: ripgrep not found! A lot of stuff won't work. Please install rigrep."
