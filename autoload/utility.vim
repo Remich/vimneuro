@@ -7,7 +7,6 @@ function! utility#PrintOptions()
 	echom &grepformat
 	echom &cpo
 	echom &selection
-	pwd
 endfunction
 
 function! utility#SaveOptions()
