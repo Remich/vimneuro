@@ -4,6 +4,7 @@ function! link#LinkingOperator(type)
 	call utility#SaveOptions()
 	call utility#SetOptions()
 	call utility#SaveRegisters(['@', 'k'])
+	call utility#SaveCfStack()
 
 	if a:type ==# 'v'
 		normal! `<v`>y
@@ -37,6 +38,7 @@ function! link#LinkingOperator(type)
 		normal! `[v`]"kp
 	endif
 
+	call utility#RestoreCfStack()
 	call utility#RestoreRegisters()
 	call utility#RestoreOptions()
 endfunction
@@ -129,6 +131,7 @@ endfunction
 function! link#Relink(oldname, newname)
 	call utility#SaveOptions()
 	call utility#SetOptions()
+	call utility#SaveCfStack()
 
 	let l:curbuf    = bufnr()
 	let linkpattern = '<'.a:oldname.'(\?cf)?>'
@@ -137,16 +140,11 @@ function! link#Relink(oldname, newname)
 	" copen
 	execute 'cfdo %substitute/\v\<'.a:oldname.'(\?cf)?\>/\<'.a:newname.'\1\>/g'
 	cfdo update
-	
-	" restore old quickfix list
-	let l:num_qflists = getqflist({'nr' : '$'}).nr
-	if l:num_qflists > 1
-		silent colder
-	endif
 
 	" switch back to original buffer
 	execute "buffer ".l:curbuf	
 
+	call utility#RestoreCfStack()
 	call utility#RestoreOptions()
 	return v:true
 endfunction

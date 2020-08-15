@@ -1,5 +1,4 @@
 let g:vimneuro_search_query = ""
-
 function! search#ByTags()
 	call utility#SaveOptions()
 	call utility#SetOptions()
@@ -128,7 +127,7 @@ function! search#QfSanitize()
 	
 	" abort if no entries
 	if len(l:qf) == 0
-		call utility#RestoreCfStack(l:qf, g:vimneuro_search_query)
+		call utility#RestoreCfStackAndPushNewList(l:qf, g:vimneuro_search_query)
 		call utility#RestoreOptions()
 		return
 	endif
@@ -152,7 +151,7 @@ function! search#QfSanitize()
 	" sort by filename and set
 	call sort(l:qf, 'search#CmpQfByFilename')
 	
-	call utility#RestoreCfStack(l:qf, g:vimneuro_search_query)
+	call utility#RestoreCfStackAndPushNewList(l:qf, g:vimneuro_search_query)
 	call utility#RestoreOptions()
 endfunction
 

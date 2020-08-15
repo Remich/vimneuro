@@ -68,17 +68,28 @@ function! utility#SaveCfStack()
 	let g:vimneuro_save_cf_id = l:qfid
 endfunction
 
-function! utility#RestoreCfStack(qflist, title)
+function! utility#RestoreCfStackAndPushNewList(qflist, title)
+
+	" restore stack
+	call utility#RestoreCfStack()
+		
+	" add new list on top of stack
+	call setqflist(a:qflist)
+	
+	" set title
+	call setqflist([], 'r', { 'title' : a:title })
+		
+endfunction
+
+function! utility#RestoreCfStack()
 	
 	" no previous list
 	if g:vimneuro_save_cf_id == -1
 		" empty whole stack
 		call setqflist([], 'f')
-		" add new list on top of stack
-		call setqflist(a:qflist)
 		return
 	endif
-		
+	
 	" get id of current list
 	let l:cur_qfid = getqflist({'id': 0}).id
 
@@ -91,10 +102,4 @@ function! utility#RestoreCfStack(qflist, title)
 		let l:cur_qfid = getqflist({'id': 0}).id
 	endwhile
 	
-	" add new list on top of stack
-	call setqflist(a:qflist)
-	
-	" set title
-	call setqflist([], 'r', { 'title' : a:title })
-		
 endfunction
