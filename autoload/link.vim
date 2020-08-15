@@ -1,5 +1,5 @@
 " create a Neuron link from text supplied by the operator
-" to a Zettel matching it's title
+" to a zettel matching it's title
 function! link#LinkingOperator(type)
 	call utility#SaveOptions()
 	call utility#SetOptions()
@@ -20,7 +20,7 @@ function! link#LinkingOperator(type)
 
 	if len(l:results) == 0
 
-		let l:confirm = confirm("ERROR: No Zettel with title ".shellescape(l:title)." found. Create new Zettel?", "&Yes\n&No")
+		let l:confirm = confirm("ERROR: No zettel with title ".shellescape(l:title)." found. Create new zettel?", "&Yes\n&No")
 		if l:confirm == 1
 			call zettels#New(l:title)
 		else
@@ -29,7 +29,7 @@ function! link#LinkingOperator(type)
 
 	elseif len(l:results) > 1
 		" TODO selection prompt, instead of error
-		echoe "ERROR: Multiple Zettels with title ".shellescape(l:title)." found."
+		echoe "ERROR: Multiple zettels with title ".shellescape(l:title)." found."
 	else
 		let d = l:results[0]
 		let l:basename = trim(system('basename '.shellescape(bufname(d.bufnr))))
@@ -125,7 +125,7 @@ function! link#CopyLinkOfSelection()
 	echom "Copied links to + register."
 endfunction
 
-" replaces links to Zettel 'oldname' with 'newname' in every Zettel
+" replaces links to zettel 'oldname' with 'newname' in every zettel
 function! link#Relink(oldname, newname)
 	call utility#SaveOptions()
 	call utility#SetOptions()

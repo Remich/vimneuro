@@ -41,7 +41,7 @@ function! parse#MetaData()
 		endif
 
 		" check for missing meta end
-		" this check fails if the Zettel also is missing the level-1 heading
+		" this check fails if the zettel also is missing the level-1 heading
 		if l:i > 1 && match(l:curline, '\v^#.*$') != -1
 			echoe "Parsing of '".l:filename."' failed! Meta-Section has no end."
 			return {}
@@ -49,7 +49,7 @@ function! parse#MetaData()
 
 		if l:state ==# 'parsing_meta'
 		
-			" is first line of Zettel a meta start?
+			" is first line of zettel a meta start?
 			if l:i == 1 && match(l:curline, '\v^---$') == -1
 				echoe "Parsing of '".l:filename."' failed! First line is missing '---'."
 				return {}

@@ -2,25 +2,29 @@
 " Author: René Michalke <rene@renemichalke.de>
 " Description: A Vim Plugin for managing a Neuron Zettelkasten.
 
-" Disable loading of plugin.
+" disable loading of plugin
 if exists("g:vimneuro_load") && g:vimneuro_load == 0
 	finish
 endif
 
+" check user option for zettelkasten path
 if exists("g:vimneuro_path_zettelkasten") == v:false
 	let g:vimneuro_path_zettelkasten = "/home/".$USER."/zettelkasten"
 endif
 
+" check user option for zettelkasten url
 if exists("g:vimneuro_url_zettelkasten") == v:false
 	let g:vimneuro_url_zettelkasten = "http://localhost/zettelkasten"
 endif
 
+" check user option for 'using randomly generated filenames'
 if exists("g:vimneuro_random_names") == v:true && g:vimneuro_random_names == 1
 	let g:vimneuro_random_names = v:true
 else
 	let g:vimneuro_random_names = v:false
 endif
 
+" check user option for 'inserting `created` meta data'
 if exists("g:vimneuro_insert_created") == v:true && g:vimneuro_insert_created == 1
 	let g:vimneuro_insert_created = v:true
 else
@@ -45,35 +49,35 @@ augroup vimneuro
 
 	if exists("g:vimneuro_did_load_mappings") == v:false
 
-		" Go Zettel
+		" Go zettel
 		if !hasmapto('<Plug>NeuronGoZettel')
 			autocmd Filetype markdown nmap <buffer><leader>gf	<Plug>NeuronGoZettel
 			noremap <unique> <script> <Plug>NeuronGoZettel		<SID>GoZettel
 			noremap <SID>GoZettel		:<c-u>call navigation#Go()<CR>
 		endif
 
-		" New Neuron Zettel
+		" New Neuron zettel
 		if !hasmapto('<Plug>NeuronNewZettel')
 			autocmd Filetype markdown nmap <buffer><leader>nn	<Plug>NeuronNewZettel
 			noremap <unique> <script> <Plug>NeuronNewZettel		<SID>NewZettel
 			noremap <SID>NewZettel		:<c-u>call zettels#New("")<CR>
 		endif
 
-		" Delete Zettel
+		" Delete zettel
 		if !hasmapto('<Plug>NeuronDeleteZettel')
 			autocmd Filetype markdown nmap <buffer><leader>nd	<Plug>NeuronDeleteZettel
 			noremap <unique> <script> <Plug>NeuronDeleteZettel		<SID>DeleteZettel
 			noremap <SID>DeleteZettel		:<c-u>call zettels#Delete()<CR>
 		endif
 
-		" Rename current Neuron Zettel
+		" Rename current Neuron zettel
 		if !hasmapto('<Plug>NeuronRenameCurrentZettel')
 			autocmd Filetype markdown nmap <buffer><leader>nr	<Plug>NeuronRenameCurrentZettel
 			noremap <unique> <script> <Plug>NeuronRenameCurrentZettel		<SID>RenameCurrentZettel
 			noremap <SID>RenameCurrentZettel		:<c-u>call zettels#RenameCurrent()<CR>
 		endif
 
-		" Rename current Neuron Zettel to title of Zettel
+		" Rename current Neuron zettel to title of zettel
 		if !hasmapto('<Plug>NeuronRenameCurrentZettelToTitle')
 			autocmd Filetype markdown nmap <buffer><leader>nR	<Plug>NeuronRenameCurrentZettelToTitle
 			noremap <unique> <script> <Plug>NeuronRenameCurrentZettelToTitle		<SID>RenameCurrentZettelToTitle
@@ -174,8 +178,6 @@ augroup vimneuro
 			noremap <SID>SearchByTags		:<c-u>call search#ByTags()<cr>
 		endif
 		
-		" call vimneuro#Foobar()<cr>
-
 		let g:vimneuro_did_load_mappings = 1
 	endif
 augroup END

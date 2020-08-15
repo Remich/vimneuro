@@ -160,7 +160,7 @@ function! search#InvertMatches()
 	call utility#SaveOptions()
 	call utility#SetOptions()
 
-	" get list of all Zettels
+	" get list of all zettels
 	let l:files = system('ls *.md')
 	let l:files = split(l:files, '\n')
 

@@ -1,4 +1,4 @@
-" touch Zettel and write some meta data and the title to it
+" touch zettel and write some meta data and the title to it
 function! zettels#TouchAndPrefill(title, name)
 	call utility#SaveOptions()
 	call utility#SetOptions()
@@ -32,7 +32,7 @@ function! zettels#New(title)
 	
 	" check argument
 	if a:title ==# ""
-		let l:title = trim(input("Enter title for new Zettel: "))
+		let l:title = trim(input("Enter title for new zettel: "))
 		execute "redraw!" | echom " "
 		if l:title ==# ""
 			let l:title = 'Zettel created on '.strftime('%F')
@@ -45,10 +45,10 @@ function! zettels#New(title)
 	let l:name     = zettels#ComputeNewZettelName(l:title)
 	let l:filename = l:name.".md"
 
-	" create Zettel
+	" create zettel
 	call zettels#TouchAndPrefill(l:title, l:filename)
 	
-	" open Zettel
+	" open zettel
 	execute "edit! ".l:filename
 	execute "normal G"
 	
@@ -140,7 +140,7 @@ function! zettels#Delete()
 	call utility#SetOptions()
 	
 	let l:filename = expand('%:p')
-	let l:confirm  = confirm('Do you really want to delete Zettel '.shellescape(l:filename).'?', "&Yes\n&No")
+	let l:confirm  = confirm('Do you really want to delete zettel '.shellescape(l:filename).'?', "&Yes\n&No")
 
 	if l:confirm == 1
 		let l:curbufname = bufname("%")
@@ -163,21 +163,21 @@ function! zettels#Rename(oldname, newname)
 	call utility#SaveOptions()
 	call utility#SetOptions()
 
-	" check if Zettel to rename really exists
+	" check if zettel to rename really exists
 	if zettels#Exists(a:oldname) == v:false
 		echom "ERROR: Zettel with name '".a:oldname."' does not exists!"
 		call utility#RestoreOptions()
 		return v:false
 	endif
 
-	" check for existing Zettel with supplied name
+	" check for existing zettel with supplied name
 	if zettels#Exists(a:newname) == v:true
-		echom "ERROR: Zettel with name '".a:newname."' already exists!"
+		echom "ERROR: zettel with name '".a:newname."' already exists!"
 		call utility#RestoreOptions()
 		return v:false
 	endif
 
-	" rename Zettel
+	" rename zettel
 	if rename(a:oldname, a:newname) == 0
 		return v:true
 	else
@@ -224,7 +224,7 @@ function! zettels#RenameCurrent()
 
 	" check for valid name
 	if match(l:newname, '[^A-Za-z0-9-_]') != -1
-		echom "ERROR: '".l:newname."' is not a valid Zettel name. Allowed Characters: [A-Za-z0-9-_]"
+		echom "ERROR: '".l:newname."' is not a valid zettel name. Allowed Characters: [A-Za-z0-9-_]"
 		call utility#RestoreOptions()
 		return
 	endif
@@ -276,7 +276,7 @@ function! zettels#RenameCurrentZettelToTitle(...)
 
 	let l:newname = zettels#TransformTitleToName(l:title)
 
-	" abort, if name of Zettel is already the same as the title
+	" abort, if name of zettel is already the same as the title
 	let l:filename = expand('%')	
 	let l:basename = substitute(l:filename, '\v\.md', '', "")
 	if l:newname ==# l:basename
@@ -286,7 +286,7 @@ function! zettels#RenameCurrentZettelToTitle(...)
 	endi
 
 	if l:dont_confirm == v:false
-		let l:confirm = confirm('Rename Zettel to '.shellescape(l:newname).'?', "&Yes\n&No")
+		let l:confirm = confirm('Rename zettel to '.shellescape(l:newname).'?', "&Yes\n&No")
 	else
 		let l:confirm = 1
 	endif

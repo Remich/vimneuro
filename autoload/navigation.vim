@@ -18,7 +18,7 @@ function! navigation#Go()
 		endif
 			
 	else
-		" extract Zettel name(s)
+		" extract zettel name(s)
 		let l:names = []
 		call substitute(l:word, '\v\<([A-Za-z0-9-_]+(\?cf)?)\>', '\=add(l:names, submatch(1))', 'g')
 	endif
@@ -44,14 +44,14 @@ function! navigation#Go()
 	let l:filename = l:name.'.md'
 	let l:fullname = g:vimneuro_path_zettelkasten."/".l:filename
 	
-	" check for existing Zettel with supplied name
+	" check for existing zettel with supplied name
 	if filereadable(l:fullname) == v:false
 		echom "ERROR: Zettel with name '".l:fullname."' does not exist!"
 		call utility#RestoreOptions()
 		return
 	endif
 
-	" open Zettel in current window
+	" open zettel in current window
 	execute "edit! ".l:filename
 	
 	call utility#RestoreOptions()
